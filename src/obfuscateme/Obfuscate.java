@@ -672,20 +672,7 @@ public class Obfuscate extends javax.swing.JFrame {
         availablePackagesTable.setAutoCreateRowSorter(true);
         availablePackagesTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null},
-                {null, null, null},
-                {null, null, null},
-                {null, null, null},
-                {null, null, null},
-                {null, null, null},
-                {null, null, null},
-                {null, null, null},
-                {null, null, null},
-                {null, null, null},
-                {null, null, null},
-                {null, null, null},
-                {null, null, null},
-                {null, null, null}
+
             },
             new String [] {
                 "Package Name", "Number of Classess", "Number of Methods"
@@ -709,6 +696,7 @@ public class Obfuscate extends javax.swing.JFrame {
         availablePackagesTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
         availablePackagesTable.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         availablePackagesTable.setFillsViewportHeight(true);
+        availablePackagesTable.setPreferredSize(new java.awt.Dimension(576, 0));
         availablePackagesTable.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         availablePackagesTable.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         availablePackagesTable.setShowGrid(true);
@@ -720,6 +708,11 @@ public class Obfuscate extends javax.swing.JFrame {
             }
         });
         jScrollPane1.setViewportView(availablePackagesTable);
+        if (availablePackagesTable.getColumnModel().getColumnCount() > 0) {
+            availablePackagesTable.getColumnModel().getColumn(0).setPreferredWidth(276);
+            availablePackagesTable.getColumnModel().getColumn(1).setPreferredWidth(150);
+            availablePackagesTable.getColumnModel().getColumn(2).setPreferredWidth(150);
+        }
 
         obfuscatePanel.add(jScrollPane1);
         jScrollPane1.setBounds(10, 190, 590, 150);
@@ -842,6 +835,11 @@ public class Obfuscate extends javax.swing.JFrame {
             }
         });
         jScrollPane2.setViewportView(selectedPackagesTable);
+        if (selectedPackagesTable.getColumnModel().getColumnCount() > 0) {
+            selectedPackagesTable.getColumnModel().getColumn(0).setPreferredWidth(276);
+            selectedPackagesTable.getColumnModel().getColumn(1).setPreferredWidth(150);
+            selectedPackagesTable.getColumnModel().getColumn(2).setPreferredWidth(150);
+        }
 
         obfuscatePanel.add(jScrollPane2);
         jScrollPane2.setBounds(680, 190, 590, 150);
