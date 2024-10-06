@@ -669,7 +669,10 @@ public class Obfuscate extends javax.swing.JFrame {
         obfuscatePanel.add(packageNameLabel);
         packageNameLabel.setBounds(620, 350, 430, 25);
 
-        availablePackagesTable.setAutoCreateRowSorter(true);
+        jScrollPane1.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        jScrollPane1.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        jScrollPane1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+
         availablePackagesTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
@@ -709,7 +712,7 @@ public class Obfuscate extends javax.swing.JFrame {
         });
         jScrollPane1.setViewportView(availablePackagesTable);
         if (availablePackagesTable.getColumnModel().getColumnCount() > 0) {
-            availablePackagesTable.getColumnModel().getColumn(0).setPreferredWidth(276);
+            availablePackagesTable.getColumnModel().getColumn(0).setPreferredWidth(278);
             availablePackagesTable.getColumnModel().getColumn(1).setPreferredWidth(150);
             availablePackagesTable.getColumnModel().getColumn(2).setPreferredWidth(150);
         }
@@ -797,6 +800,10 @@ public class Obfuscate extends javax.swing.JFrame {
         obfuscateLabel.setText("Obfuscate");
         obfuscatePanel.add(obfuscateLabel);
         obfuscateLabel.setBounds(360, 400, 90, 50);
+
+        jScrollPane2.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        jScrollPane2.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        jScrollPane2.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
 
         selectedPackagesTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {

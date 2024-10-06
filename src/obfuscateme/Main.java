@@ -20,6 +20,7 @@ import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -46,8 +47,9 @@ public class Main extends javax.swing.JFrame {
         initComponents();
         // Center the frame on the screen.
         this.setLocationRelativeTo(null);
-        progressHolderLabel.setVisible(false);
-        progressLabel.setVisible(false);
+        consoleScrollPane.setVisible(false);
+//        progressHolderLabel.setVisible(false);
+//        progressLabel.setVisible(false);
     }
 
     private static Image getImage(String path) {
@@ -72,11 +74,9 @@ public class Main extends javax.swing.JFrame {
         mainPanel = new javax.swing.JPanel();
         title = new javax.swing.JLabel();
         selectAPKFileButton = new javax.swing.JButton();
-        progressHolderLabel = new javax.swing.JLabel();
         apkFileNameLabel = new javax.swing.JLabel();
         decompileButton = new javax.swing.JButton();
         selectedAPKFileLabel = new javax.swing.JLabel();
-        progressLabel = new javax.swing.JLabel();
         linkedInButton = new javax.swing.JButton();
         gitHubProfileButton = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
@@ -84,6 +84,8 @@ public class Main extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
+        consoleScrollPane = new javax.swing.JScrollPane();
+        consoleArea = new javax.swing.JTextArea();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("ObfuscateMe");
@@ -105,19 +107,13 @@ public class Main extends javax.swing.JFrame {
             }
         });
         mainPanel.add(selectAPKFileButton);
-        selectAPKFileButton.setBounds(360, 210, 140, 46);
-
-        progressHolderLabel.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        progressHolderLabel.setText("Progress:");
-        progressHolderLabel.setEnabled(false);
-        mainPanel.add(progressHolderLabel);
-        progressHolderLabel.setBounds(260, 360, 100, 25);
+        selectAPKFileButton.setBounds(360, 220, 140, 46);
 
         apkFileNameLabel.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         apkFileNameLabel.setForeground(new java.awt.Color(255, 0, 0));
         apkFileNameLabel.setText("Please select an APK file");
         mainPanel.add(apkFileNameLabel);
-        apkFileNameLabel.setBounds(420, 260, 350, 30);
+        apkFileNameLabel.setBounds(420, 290, 350, 30);
 
         decompileButton.setText("Decompile");
         decompileButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -129,19 +125,12 @@ public class Main extends javax.swing.JFrame {
             }
         });
         mainPanel.add(decompileButton);
-        decompileButton.setBounds(360, 300, 140, 46);
+        decompileButton.setBounds(360, 340, 140, 46);
 
         selectedAPKFileLabel.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         selectedAPKFileLabel.setText("Selected APK file:");
         mainPanel.add(selectedAPKFileLabel);
-        selectedAPKFileLabel.setBounds(250, 260, 150, 30);
-
-        progressLabel.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        progressLabel.setForeground(new java.awt.Color(255, 0, 0));
-        progressLabel.setText("Progress");
-        progressLabel.setEnabled(false);
-        mainPanel.add(progressLabel);
-        progressLabel.setBounds(360, 360, 500, 25);
+        selectedAPKFileLabel.setBounds(250, 290, 150, 30);
 
         linkedInButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/obfuscateme/img/linkedin.png"))); // NOI18N
         linkedInButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -152,7 +141,7 @@ public class Main extends javax.swing.JFrame {
             }
         });
         mainPanel.add(linkedInButton);
-        linkedInButton.setBounds(70, 390, 50, 50);
+        linkedInButton.setBounds(70, 410, 50, 50);
 
         gitHubProfileButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/obfuscateme/img/github-48.png"))); // NOI18N
         gitHubProfileButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -163,30 +152,41 @@ public class Main extends javax.swing.JFrame {
             }
         });
         mainPanel.add(gitHubProfileButton);
-        gitHubProfileButton.setBounds(10, 390, 50, 50);
+        gitHubProfileButton.setBounds(10, 410, 50, 50);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/obfuscateme/img/final 1 _ 140x130.jpg"))); // NOI18N
         mainPanel.add(jLabel1);
-        jLabel1.setBounds(360, 50, 140, 130);
+        jLabel1.setBounds(360, 60, 140, 130);
 
         loadingLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/obfuscateme/img/loading.gif"))); // NOI18N
         mainPanel.add(loadingLabel);
-        loadingLabel.setBounds(410, 390, 48, 48);
+        loadingLabel.setBounds(400, 410, 48, 48);
         loadingLabel.setVisible(false);
 
         jLabel2.setText("Obfuscation tool for APK");
         mainPanel.add(jLabel2);
-        jLabel2.setBounds(370, 180, 150, 20);
+        jLabel2.setBounds(360, 200, 150, 20);
 
         jLabel3.setFont(new java.awt.Font("Segoe UI", 2, 14)); // NOI18N
         jLabel3.setText("Developed by Abdalhaleem Altamimi - @ReSo7200");
         mainPanel.add(jLabel3);
-        jLabel3.setBounds(560, 400, 340, 20);
+        jLabel3.setBounds(550, 420, 340, 20);
 
         jLabel4.setFont(new java.awt.Font("Segoe UI", 2, 12)); // NOI18N
         jLabel4.setText("University of Bedfordshire Undergradute Project - Student ID: 2113263");
         mainPanel.add(jLabel4);
-        jLabel4.setBounds(520, 430, 380, 16);
+        jLabel4.setBounds(510, 450, 380, 16);
+
+        consoleArea.setEditable(false);
+        consoleArea.setBackground(new java.awt.Color(0, 0, 0));
+        consoleArea.setColumns(20);
+        consoleArea.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
+        consoleArea.setForeground(new java.awt.Color(255, 255, 255));
+        consoleArea.setRows(5);
+        consoleScrollPane.setViewportView(consoleArea);
+
+        mainPanel.add(consoleScrollPane);
+        consoleScrollPane.setBounds(180, 250, 520, 160);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -198,7 +198,9 @@ public class Main extends javax.swing.JFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(mainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 450, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(mainPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 479, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
 
         pack();
@@ -239,7 +241,7 @@ public class Main extends javax.swing.JFrame {
 
         String apkFileName = selectedApkPath.getFileName().toString();
         String apkBaseName = apkFileName.replaceFirst("[.][^.]+$", ""); // Remove the file extension
-        JFileChooser fileChooser = new JFileChooser();
+        JFileChooser fileChooser = new JFileChooser(System.getProperty("user.dir"));
 
         // Set it to directory selection mode (instead of file selection)
         fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -253,6 +255,7 @@ public class Main extends javax.swing.JFrame {
                 File selectedDirectory = fileChooser.getSelectedFile();
                 // Create the output directory path using the selected directory and APK file name
                 outputDirectory = Paths.get(selectedDirectory.getAbsolutePath(), apkBaseName);
+
                 System.out.println("Selected output directory: " + outputDirectory);
 
                 // Check if the directory exists only if user approves a directory
@@ -325,12 +328,19 @@ public class Main extends javax.swing.JFrame {
     }
 
     private void executeApktool(String apkFileName) {
-        selectAPKFileButton.setEnabled(false);
-        decompileButton.setEnabled(false);
+        selectAPKFileButton.setVisible(false);
+        decompileButton.setVisible(false);
         loadingLabel.setVisible(true);
+        consoleScrollPane.setVisible(true);
+        selectedAPKFileLabel.setBounds(220, 220, 350, 30);
+        apkFileNameLabel.setBounds(390, 220, 350, 30);
+        mainPanel.repaint();
+        consoleArea.append("Decompiling APK file: " + selectedApkPath + "\n");
+        consoleArea.append("Output directory: " + outputDirectory + "\n");
+
         String apkToolPath = new File("src/obfuscateme/apktool.jar").getAbsolutePath();
         ProcessBuilder processBuilder = new ProcessBuilder(
-                "java", "-jar", apkToolPath, "d", selectedApkPath.toAbsolutePath().toString(), "-o", outputDirectory.toAbsolutePath().toString()
+                "java", "-jar", apkToolPath, "d", selectedApkPath.toAbsolutePath().toString(), "-o", outputDirectory.toAbsolutePath().toString(), "-f"
         );
 
         // Redirect error stream to the output stream
@@ -347,7 +357,14 @@ public class Main extends javax.swing.JFrame {
                     String line;
                     while ((line = reader.readLine()) != null) {
 //                        System.out.println(line); // Print the apktool output to the console
-                        publish(line); // Publish the progress data to process in the Swing thread
+                        String cleanLine = "";
+                        if (line.startsWith("I:")) {
+                        // Remove the "I:" prefix and any leading whitespace
+                            cleanLine = line.substring(line.indexOf("I:") + 2).trim();
+                        }
+                        consoleArea.append(cleanLine + "\n");
+                        consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
+                        //publish(line); // Publish the progress data to process in the Swing thread
                     }
                 }
                 // Wait for the process to finish
@@ -356,46 +373,52 @@ public class Main extends javax.swing.JFrame {
             }
 
             @Override
-            protected void process(List<String> chunks) {
-                // Here you could update a progress bar or display info to the user
-                progressHolderLabel.setVisible(true);
-                progressHolderLabel.setEnabled(true);
-                progressLabel.setVisible(true);
-                progressLabel.setEnabled(true);
-                for (String line : chunks) {
-//                    System.out.println("Progress info: " + line);
-                    if (line.startsWith("I:")) {
-                        // Remove the "I:" prefix and any leading whitespace
-                        String cleanLine = line.substring(line.indexOf("I:") + 2).trim();
-                        System.out.println(cleanLine);
-                        progressLabel.setText(cleanLine); // Update the text of the label
-                    }
-                }
-            }
-
-            @Override
             protected void done() {
-                // This method is called when the background task is finished
+                // This method is called when the background task (decompilation) is finished
                 try {
-                    // Get the result of the background computation from the SwingWorker
-                    boolean success = get();
+                    boolean success = get(); // Get the result of the background computation
                     if (success) {
                         decompiledApkPath = outputDirectory.toAbsolutePath().toString();
                         publicAPKFileName = apkFileName;
                         decompileFolderName = String.valueOf(outputDirectory.getFileName());
+                        
                         loadingLabel.setVisible(false);
+                        // Show the success message
                         JOptionPane.showMessageDialog(null, "Decompilation completed successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
-                        dispose();
-                        new Obfuscate().setVisible(true);
+                        loadingLabel.setVisible(true);
+                        
+                        // Keep the loading label visible and update the console area
+                        consoleArea.append("Analysing decompiled APK... Please wait!\n");
+                        consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
+
+                        // Create a new background task to launch the Obfuscate frame
+                        SwingWorker<Void, Void> frameWorker = new SwingWorker<Void, Void>() {
+                            @Override
+                            protected Void doInBackground() throws Exception {
+                                // Create and launch the new frame in the background
+                                Obfuscate obfuscateFrame = new Obfuscate();
+                                obfuscateFrame.setVisible(true);
+                                return null;
+                            }
+
+                            @Override
+                            protected void done() {
+                                // Once the new frame is fully visible dispose of the current frame
+                                dispose();
+                            }
+                        };
+
+                        // Execute the background task for launching the new frame
+                        frameWorker.execute();
 
                     } else {
+                        // Handle decompilation failure
                         JOptionPane.showMessageDialog(null, "Decompilation failed.", "Decompilation Failed", JOptionPane.ERROR_MESSAGE);
                         selectAPKFileButton.setEnabled(true);
                         decompileButton.setEnabled(true);
                     }
                 } catch (InterruptedException | ExecutionException e) {
                     JOptionPane.showMessageDialog(null, "An error occurred during decompilation.", "Error", JOptionPane.ERROR_MESSAGE);
-                    e.printStackTrace();
                     selectAPKFileButton.setEnabled(true);
                     decompileButton.setEnabled(true);
                 }
@@ -455,6 +478,8 @@ public class Main extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel apkFileNameLabel;
+    private javax.swing.JTextArea consoleArea;
+    private javax.swing.JScrollPane consoleScrollPane;
     private javax.swing.JButton decompileButton;
     private javax.swing.JButton gitHubProfileButton;
     private javax.swing.JLabel jLabel1;
@@ -464,8 +489,6 @@ public class Main extends javax.swing.JFrame {
     private javax.swing.JButton linkedInButton;
     private javax.swing.JLabel loadingLabel;
     private javax.swing.JPanel mainPanel;
-    private javax.swing.JLabel progressHolderLabel;
-    private javax.swing.JLabel progressLabel;
     private javax.swing.JButton selectAPKFileButton;
     private javax.swing.JLabel selectedAPKFileLabel;
     private javax.swing.JLabel title;
