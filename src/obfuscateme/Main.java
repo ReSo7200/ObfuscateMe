@@ -13,14 +13,12 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -141,7 +139,7 @@ public class Main extends javax.swing.JFrame {
             }
         });
         mainPanel.add(linkedInButton);
-        linkedInButton.setBounds(70, 410, 50, 50);
+        linkedInButton.setBounds(70, 440, 50, 50);
 
         gitHubProfileButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/obfuscateme/img/github-48.png"))); // NOI18N
         gitHubProfileButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -152,7 +150,7 @@ public class Main extends javax.swing.JFrame {
             }
         });
         mainPanel.add(gitHubProfileButton);
-        gitHubProfileButton.setBounds(10, 410, 50, 50);
+        gitHubProfileButton.setBounds(10, 440, 50, 50);
 
         logoLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/obfuscateme/img/final 1 _ 140x130.jpg"))); // NOI18N
         mainPanel.add(logoLabel);
@@ -160,7 +158,7 @@ public class Main extends javax.swing.JFrame {
 
         loadingLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/obfuscateme/img/loading.gif"))); // NOI18N
         mainPanel.add(loadingLabel);
-        loadingLabel.setBounds(400, 410, 48, 48);
+        loadingLabel.setBounds(410, 410, 48, 48);
         loadingLabel.setVisible(false);
 
         descriptionLabel.setText("Obfuscation tool for APK");
@@ -170,12 +168,12 @@ public class Main extends javax.swing.JFrame {
         infoLabel.setFont(new java.awt.Font("Segoe UI", 2, 14)); // NOI18N
         infoLabel.setText("Developed by Abdalhaleem Altamimi - @ReSo7200");
         mainPanel.add(infoLabel);
-        infoLabel.setBounds(550, 420, 340, 20);
+        infoLabel.setBounds(550, 440, 340, 20);
 
         info2Label.setFont(new java.awt.Font("Segoe UI", 2, 12)); // NOI18N
         info2Label.setText("University of Bedfordshire Undergradute Project - Student ID: 2113263");
         mainPanel.add(info2Label);
-        info2Label.setBounds(510, 450, 380, 16);
+        info2Label.setBounds(510, 470, 380, 16);
 
         consoleArea.setEditable(false);
         consoleArea.setBackground(new java.awt.Color(0, 0, 0));
@@ -199,7 +197,7 @@ public class Main extends javax.swing.JFrame {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(mainPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 479, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(mainPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 499, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, Short.MAX_VALUE))
         );
 

@@ -298,6 +298,12 @@ public class Recompile extends javax.swing.JFrame {
         if (userSelection == JFileChooser.APPROVE_OPTION) {
             signCheckBox.setVisible(false);
             keyCheckBox.setVisible(false);
+            numberOfOClassesLabel.setVisible(false);
+            numberOfClassesLabel.setVisible(false);
+            numberOfOMethodsLabel.setVisible(false);
+            numberOfMethodsLabel.setVisible(false);
+            numberOfOLFieldsLabel.setVisible(false);
+            numberOfLFieldsLabel.setVisible(false);
             recombileButton.setEnabled(false);
             fileToSave = fileChooser.getSelectedFile();
             consoleScrollPane.setVisible(true);

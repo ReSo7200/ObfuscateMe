@@ -759,7 +759,7 @@ public class Obfuscate extends javax.swing.JFrame {
 
         loadingLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/obfuscateme/img/loading.gif"))); // NOI18N
         obfuscatePanel.add(loadingLabel);
-        loadingLabel.setBounds(610, 630, 48, 48);
+        loadingLabel.setBounds(620, 580, 48, 48);
         loadingLabel.setVisible(false);
 
         decompileFolderLabel.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
@@ -927,7 +927,7 @@ public class Obfuscate extends javax.swing.JFrame {
             }
         });
         obfuscatePanel.add(gitHubProfileButton);
-        gitHubProfileButton.setBounds(20, 640, 50, 50);
+        gitHubProfileButton.setBounds(20, 620, 50, 50);
 
         obfuscateCBPanel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 3));
 
@@ -1066,7 +1066,7 @@ public class Obfuscate extends javax.swing.JFrame {
             }
         });
         obfuscatePanel.add(linkedInButton);
-        linkedInButton.setBounds(80, 640, 50, 50);
+        linkedInButton.setBounds(80, 620, 50, 50);
 
         backButton.setText("Back to main page");
         backButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -1076,7 +1076,7 @@ public class Obfuscate extends javax.swing.JFrame {
             }
         });
         obfuscatePanel.add(backButton);
-        backButton.setBounds(1110, 630, 150, 60);
+        backButton.setBounds(1110, 610, 150, 60);
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel1.setText("Select the packages to be obfusacted");
@@ -1086,12 +1086,12 @@ public class Obfuscate extends javax.swing.JFrame {
         jLabel3.setFont(new java.awt.Font("Segoe UI", 2, 14)); // NOI18N
         jLabel3.setText("Developed by Abdalhaleem Altamimi - @ReSo7200");
         obfuscatePanel.add(jLabel3);
-        jLabel3.setBounds(230, 670, 340, 20);
+        jLabel3.setBounds(230, 650, 340, 20);
 
         jLabel4.setFont(new java.awt.Font("Segoe UI", 2, 12)); // NOI18N
         jLabel4.setText("University of Bedfordshire Undergradute Project - Student ID: 2113263");
         obfuscatePanel.add(jLabel4);
-        jLabel4.setBounds(680, 670, 380, 16);
+        jLabel4.setBounds(680, 650, 380, 16);
 
         jLabel2.setFont(new java.awt.Font("Segoe UI", 3, 14)); // NOI18N
         jLabel2.setText("Selected Packages:");
@@ -1111,9 +1111,7 @@ public class Obfuscate extends javax.swing.JFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(obfuscatePanel, javax.swing.GroupLayout.PREFERRED_SIZE, 700, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+            .addComponent(obfuscatePanel, javax.swing.GroupLayout.PREFERRED_SIZE, 685, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
 
         pack();
