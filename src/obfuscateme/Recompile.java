@@ -17,6 +17,7 @@ import java.util.concurrent.ExecutionException;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  *
@@ -55,7 +56,7 @@ public class Recompile extends javax.swing.JFrame {
         title = new javax.swing.JLabel();
         selectedAPKFileLabel = new javax.swing.JLabel();
         apkFileNameLabel = new javax.swing.JLabel();
-        selectedPackageNameLabel = new javax.swing.JLabel();
+        selectedPackagesNumberLabel = new javax.swing.JLabel();
         packageNameLabel = new javax.swing.JLabel();
         numberOfOMethodsLabel = new javax.swing.JLabel();
         numberOfOClassesLabel = new javax.swing.JLabel();
@@ -68,7 +69,7 @@ public class Recompile extends javax.swing.JFrame {
         loadingLabel = new javax.swing.JLabel();
         backButton = new javax.swing.JButton();
         linkedInButton = new javax.swing.JButton();
-        numberOfOLFieldsLabel = new javax.swing.JLabel();
+        numberOfOFieldsLabel = new javax.swing.JLabel();
         numberOfLFieldsLabel = new javax.swing.JLabel();
         consoleScrollPane = new javax.swing.JScrollPane();
         consoleArea = new javax.swing.JTextArea();
@@ -93,18 +94,18 @@ public class Recompile extends javax.swing.JFrame {
         apkFileNameLabel.setForeground(new java.awt.Color(255, 0, 0));
         apkFileNameLabel.setText("APK file name");
         recompilePanel.add(apkFileNameLabel);
-        apkFileNameLabel.setBounds(270, 70, 340, 25);
+        apkFileNameLabel.setBounds(280, 70, 340, 25);
 
-        selectedPackageNameLabel.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        selectedPackageNameLabel.setText("Selected Package(s):");
-        recompilePanel.add(selectedPackageNameLabel);
-        selectedPackageNameLabel.setBounds(70, 110, 180, 25);
+        selectedPackagesNumberLabel.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        selectedPackagesNumberLabel.setText("Number of Package(s):");
+        recompilePanel.add(selectedPackagesNumberLabel);
+        selectedPackagesNumberLabel.setBounds(70, 110, 210, 25);
 
         packageNameLabel.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         packageNameLabel.setForeground(new java.awt.Color(255, 0, 0));
         packageNameLabel.setText("Package Number");
         recompilePanel.add(packageNameLabel);
-        packageNameLabel.setBounds(270, 110, 340, 25);
+        packageNameLabel.setBounds(280, 110, 340, 25);
 
         numberOfOMethodsLabel.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         numberOfOMethodsLabel.setText("Number of Obfuscated Methods:");
@@ -204,10 +205,10 @@ public class Recompile extends javax.swing.JFrame {
         recompilePanel.add(linkedInButton);
         linkedInButton.setBounds(80, 430, 50, 50);
 
-        numberOfOLFieldsLabel.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        numberOfOLFieldsLabel.setText("Number of Obfuscated L.Fields:");
-        recompilePanel.add(numberOfOLFieldsLabel);
-        numberOfOLFieldsLabel.setBounds(180, 240, 190, 30);
+        numberOfOFieldsLabel.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        numberOfOFieldsLabel.setText("Number of Obfuscated Fields:");
+        recompilePanel.add(numberOfOFieldsLabel);
+        numberOfOFieldsLabel.setBounds(180, 240, 190, 30);
 
         numberOfLFieldsLabel.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         numberOfLFieldsLabel.setForeground(new java.awt.Color(255, 0, 0));
@@ -302,7 +303,7 @@ public class Recompile extends javax.swing.JFrame {
             numberOfClassesLabel.setVisible(false);
             numberOfOMethodsLabel.setVisible(false);
             numberOfMethodsLabel.setVisible(false);
-            numberOfOLFieldsLabel.setVisible(false);
+            numberOfOFieldsLabel.setVisible(false);
             numberOfLFieldsLabel.setVisible(false);
             recombileButton.setEnabled(false);
             fileToSave = fileChooser.getSelectedFile();
@@ -401,7 +402,7 @@ public class Recompile extends javax.swing.JFrame {
                                 File directory = fileToSave.getParentFile();
                                 try {
                                     Desktop.getDesktop().open((directory));
-                                } catch (Exception e) {
+                                } catch (IOException e) {
                                     JOptionPane.showMessageDialog(null, "An error occurred while trying to open");
                                 }
 
@@ -460,6 +461,8 @@ public class Recompile extends javax.swing.JFrame {
         } else {
             // Use JFileChooser to let the user select the keystore file
             JFileChooser fileChooser = new JFileChooser();
+            // Only allow .jks files in the file chooser
+            fileChooser.setFileFilter(new FileNameExtensionFilter("Java Keystore Files (*.jks)", "jks"));
             fileChooser.setDialogTitle("Select Keystore File");
 
             int userSelection = fileChooser.showOpenDialog(null); // Show the file chooser
@@ -646,6 +649,7 @@ public class Recompile extends javax.swing.JFrame {
                 }
             }
 
+            @Override
             protected void done() {
                 try {
                     boolean success = get();
@@ -745,13 +749,13 @@ public class Recompile extends javax.swing.JFrame {
     private javax.swing.JLabel numberOfLFieldsLabel;
     private javax.swing.JLabel numberOfMethodsLabel;
     private javax.swing.JLabel numberOfOClassesLabel;
-    private javax.swing.JLabel numberOfOLFieldsLabel;
+    private javax.swing.JLabel numberOfOFieldsLabel;
     private javax.swing.JLabel numberOfOMethodsLabel;
     private javax.swing.JLabel packageNameLabel;
     private javax.swing.JButton recombileButton;
     private javax.swing.JPanel recompilePanel;
     private javax.swing.JLabel selectedAPKFileLabel;
-    private javax.swing.JLabel selectedPackageNameLabel;
+    private javax.swing.JLabel selectedPackagesNumberLabel;
     private javax.swing.JCheckBox signCheckBox;
     private javax.swing.JLabel title;
     // End of variables declaration//GEN-END:variables

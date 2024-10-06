@@ -4,6 +4,7 @@
  */
 package obfuscateme;
 
+import java.awt.Desktop;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -15,8 +16,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -54,7 +57,8 @@ public class Obfuscate extends javax.swing.JFrame {
         apkFileNameLabel.setText(Main.publicAPKFileName);
         decompileFolderNameLabel.setText(Main.decompileFolderName);
 
-    }                       
+    }
+
     private void reapplySelections() {
         availablePackagesTable.clearSelection(); // Clear current selection
         for (String packageName : selectedPackageNames) {
@@ -212,12 +216,17 @@ public class Obfuscate extends javax.swing.JFrame {
         int countOfrows = selectedPackagesTable.getRowCount();
         if (countOfrows < 1) {
             obfuscateButton.setEnabled(false);
+            addSaltCheckBox.setEnabled(false);
+            
         } else if (classesCheckBox.isSelected() || methodsCheckBox.isSelected() || fieldVariablesCheckBox.isSelected()) {
             obfuscateButton.setEnabled(true);
+            addSaltCheckBox.setEnabled(true);
         } else if (!classesCheckBox.isSelected() && !methodsCheckBox.isSelected() && !fieldVariablesCheckBox.isSelected()) {
             obfuscateButton.setEnabled(false);
+            addSaltCheckBox.setEnabled(false);
         } else {
             obfuscateButton.setEnabled(true);
+            addSaltCheckBox.setEnabled(true);
         }
     }
 
@@ -274,6 +283,21 @@ public class Obfuscate extends javax.swing.JFrame {
             logCollectedNamesForObfuscation(selectedPackageName, classRenameMap, methodRenameMap, fieldVariableRenameMap, decompiledDir);
         }
     }
+    
+    public static String generateDynamicSalt() {
+        String ALPHANUMERIC_CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        int SALT_LENGTH = 8;
+        SecureRandom random = new SecureRandom();
+        StringBuilder salt = new StringBuilder(SALT_LENGTH);
+
+        // Generate a random alphanumeric string
+        for (int i = 0; i < SALT_LENGTH; i++) {
+            int index = random.nextInt(ALPHANUMERIC_CHARACTERS.length());
+            salt.append(ALPHANUMERIC_CHARACTERS.charAt(index));
+        }
+
+        return salt.toString(); // Return the alphanumeric salt
+    }
 
     private void processFileForObfuscation(String content, String fileName) {
         if (classesCheckBox.isSelected()) {
@@ -282,7 +306,13 @@ public class Obfuscate extends javax.swing.JFrame {
                 loadBlacklistedClasses();
             }
             if (!excludedClasses.contains(className)) {
-                classRenameMap.putIfAbsent(className, "Class" + UUID.randomUUID().toString().replace("-", ""));
+                if (addSaltCheckBox.isSelected()){
+                    classRenameMap.putIfAbsent(className, "Class" + generateDynamicSalt() + UUID.randomUUID().toString().replace("-", ""));
+                }
+                else{
+                    classRenameMap.putIfAbsent(className, "Class" + UUID.randomUUID().toString().replace("-", "")); 
+                }
+                
             }
         }
         if (methodsCheckBox.isSelected()) {
@@ -293,7 +323,13 @@ public class Obfuscate extends javax.swing.JFrame {
                     loadBlacklistedMethods();
                 }
                 if (!excludedMethods.contains(methodName)) {
-                    methodRenameMap.putIfAbsent(methodName, "Method" + UUID.randomUUID().toString().replace("-", ""));
+                    if (addSaltCheckBox.isSelected()){
+                        methodRenameMap.putIfAbsent(methodName, "Method" + generateDynamicSalt() + UUID.randomUUID().toString().replace("-", ""));
+                    }
+                    else{
+                        methodRenameMap.putIfAbsent(methodName, "Method" + UUID.randomUUID().toString().replace("-", ""));
+                    }
+                    
                 }
             }
         }
@@ -305,7 +341,13 @@ public class Obfuscate extends javax.swing.JFrame {
                     loadBlacklistedFieldVariables();
                 }
                 if (!excludedFields.contains(fieldName)) {
-                    fieldVariableRenameMap.putIfAbsent(fieldName, "Field" + UUID.randomUUID().toString().replace("-", ""));
+                    if (addSaltCheckBox.isSelected()){
+                        fieldVariableRenameMap.putIfAbsent(fieldName, "Field" + generateDynamicSalt() + UUID.randomUUID().toString().replace("-", ""));
+                    }
+                    else{
+                        fieldVariableRenameMap.putIfAbsent(fieldName, "Field" + UUID.randomUUID().toString().replace("-", ""));
+                    }
+                    
                 }
             }
         }
@@ -544,12 +586,39 @@ public class Obfuscate extends javax.swing.JFrame {
                 numberOfRefactoedClasses.set(refactoredClassNames.size()); // Reflects unique class count
                 numberOfRefactoredMethods.set(refactoredMethodNames.size()); // Reflects unique method count
                 numberOfRefactoredLFields.set(refactoredFieldVariableNames.size()); // Reflects unique Local fields count
-                
-                System.out.println("Refactoring complete");
+
                 consoleArea.append("Refactoring complete.");
                 consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
-                dispose();
-                new Recompile().setVisible(true);
+
+                // Ask the user if they want to proceed with recompilation
+                int result = JOptionPane.showConfirmDialog(null,
+                        "Refactoring is complete. Would you like to proceed with the recompilation process?",
+                        "Recompilation",
+                        JOptionPane.YES_NO_OPTION);
+
+                // If the user chooses "Yes", start the recompilation
+                if (result == JOptionPane.YES_OPTION) {
+                    dispose();
+                    new Recompile().setVisible(true);
+                } else {
+                    // If the user chooses "No", ask if they want to open the decompilation folder
+                    int openFolderResponse = JOptionPane.showConfirmDialog(null,
+                            "Would you like to open the decompilation folder?",
+                            "Open Folder",
+                            JOptionPane.YES_NO_OPTION);
+
+                    if (openFolderResponse == JOptionPane.YES_OPTION) {
+                        // If yes, open the directory
+                        File directory = Main.outputDirFile; // Assuming fileToSave is the file created by the process
+                        try {
+                            Desktop.getDesktop().open(directory);
+                        } catch (IOException e) {
+                            JOptionPane.showMessageDialog(null, "An error occurred while trying to open the folder.");
+                        }
+                    }
+                    dispose();
+                }
+
             }
         };
 
@@ -626,6 +695,7 @@ public class Obfuscate extends javax.swing.JFrame {
         jLabel4 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
+        addSaltCheckBox = new javax.swing.JCheckBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setResizable(false);
@@ -647,7 +717,7 @@ public class Obfuscate extends javax.swing.JFrame {
             }
         });
         obfuscatePanel.add(obfuscateButton);
-        obfuscateButton.setBounds(580, 540, 148, 46);
+        obfuscateButton.setBounds(580, 570, 148, 46);
 
         selectedAPKFileLabel.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         selectedAPKFileLabel.setText("Selected APK file:");
@@ -786,7 +856,7 @@ public class Obfuscate extends javax.swing.JFrame {
         noteLabel.setForeground(new java.awt.Color(255, 0, 0));
         noteLabel.setText("* Please follow the documentation");
         obfuscatePanel.add(noteLabel);
-        noteLabel.setBounds(570, 520, 200, 20);
+        noteLabel.setBounds(570, 550, 200, 20);
 
         obfuscateLabel.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         obfuscateLabel.setText("Obfuscate");
@@ -1103,6 +1173,11 @@ public class Obfuscate extends javax.swing.JFrame {
         obfuscatePanel.add(jLabel5);
         jLabel5.setBounds(10, 170, 150, 20);
 
+        addSaltCheckBox.setText("Random Salt?");
+        addSaltCheckBox.setEnabled(false);
+        obfuscatePanel.add(addSaltCheckBox);
+        addSaltCheckBox.setBounds(610, 520, 110, 20);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -1122,14 +1197,15 @@ public class Obfuscate extends javax.swing.JFrame {
         try {
             // Get the selected packages from the table
             updatePackageNamesFromTable(selectedPackagesTable);
-            
+
             obfuscateButton.setVisible(false);
             obfuscateLabel.setVisible(false);
             blackListLabel.setVisible(false);
             noteLabel.setVisible(false);
             obfuscateCBPanel.setVisible(false);
+            addSaltCheckBox.setVisible(false);
             consoleScrollPane.setVisible(true);
-            
+
             // Collect class and method names wihtin the specified package
             collectNames();
 
@@ -1390,6 +1466,7 @@ public class Obfuscate extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addPackageButton;
+    private javax.swing.JCheckBox addSaltCheckBox;
     private javax.swing.JLabel apkFileNameLabel;
     private javax.swing.JTable availablePackagesTable;
     private javax.swing.JButton backButton;
