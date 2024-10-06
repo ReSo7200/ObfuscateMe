@@ -79,11 +79,11 @@ public class Main extends javax.swing.JFrame {
         selectedAPKFileLabel = new javax.swing.JLabel();
         linkedInButton = new javax.swing.JButton();
         gitHubProfileButton = new javax.swing.JButton();
-        jLabel1 = new javax.swing.JLabel();
+        logoLabel = new javax.swing.JLabel();
         loadingLabel = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
+        descriptionLabel = new javax.swing.JLabel();
+        infoLabel = new javax.swing.JLabel();
+        info2Label = new javax.swing.JLabel();
         consoleScrollPane = new javax.swing.JScrollPane();
         consoleArea = new javax.swing.JTextArea();
 
@@ -154,28 +154,28 @@ public class Main extends javax.swing.JFrame {
         mainPanel.add(gitHubProfileButton);
         gitHubProfileButton.setBounds(10, 410, 50, 50);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/obfuscateme/img/final 1 _ 140x130.jpg"))); // NOI18N
-        mainPanel.add(jLabel1);
-        jLabel1.setBounds(360, 60, 140, 130);
+        logoLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/obfuscateme/img/final 1 _ 140x130.jpg"))); // NOI18N
+        mainPanel.add(logoLabel);
+        logoLabel.setBounds(360, 60, 140, 130);
 
         loadingLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/obfuscateme/img/loading.gif"))); // NOI18N
         mainPanel.add(loadingLabel);
         loadingLabel.setBounds(400, 410, 48, 48);
         loadingLabel.setVisible(false);
 
-        jLabel2.setText("Obfuscation tool for APK");
-        mainPanel.add(jLabel2);
-        jLabel2.setBounds(360, 200, 150, 20);
+        descriptionLabel.setText("Obfuscation tool for APK");
+        mainPanel.add(descriptionLabel);
+        descriptionLabel.setBounds(360, 200, 150, 20);
 
-        jLabel3.setFont(new java.awt.Font("Segoe UI", 2, 14)); // NOI18N
-        jLabel3.setText("Developed by Abdalhaleem Altamimi - @ReSo7200");
-        mainPanel.add(jLabel3);
-        jLabel3.setBounds(550, 420, 340, 20);
+        infoLabel.setFont(new java.awt.Font("Segoe UI", 2, 14)); // NOI18N
+        infoLabel.setText("Developed by Abdalhaleem Altamimi - @ReSo7200");
+        mainPanel.add(infoLabel);
+        infoLabel.setBounds(550, 420, 340, 20);
 
-        jLabel4.setFont(new java.awt.Font("Segoe UI", 2, 12)); // NOI18N
-        jLabel4.setText("University of Bedfordshire Undergradute Project - Student ID: 2113263");
-        mainPanel.add(jLabel4);
-        jLabel4.setBounds(510, 450, 380, 16);
+        info2Label.setFont(new java.awt.Font("Segoe UI", 2, 12)); // NOI18N
+        info2Label.setText("University of Bedfordshire Undergradute Project - Student ID: 2113263");
+        mainPanel.add(info2Label);
+        info2Label.setBounds(510, 450, 380, 16);
 
         consoleArea.setEditable(false);
         consoleArea.setBackground(new java.awt.Color(0, 0, 0));
@@ -481,13 +481,13 @@ public class Main extends javax.swing.JFrame {
     private javax.swing.JTextArea consoleArea;
     private javax.swing.JScrollPane consoleScrollPane;
     private javax.swing.JButton decompileButton;
+    private javax.swing.JLabel descriptionLabel;
     private javax.swing.JButton gitHubProfileButton;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel info2Label;
+    private javax.swing.JLabel infoLabel;
     private javax.swing.JButton linkedInButton;
     private javax.swing.JLabel loadingLabel;
+    private javax.swing.JLabel logoLabel;
     private javax.swing.JPanel mainPanel;
     private javax.swing.JButton selectAPKFileButton;
     private javax.swing.JLabel selectedAPKFileLabel;

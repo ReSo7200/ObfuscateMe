@@ -50,8 +50,7 @@ public class Obfuscate extends javax.swing.JFrame {
         initComponents();
         setIconImage(Main.icon.getImage());
         this.setLocationRelativeTo(null);
-        progressLabel.setVisible(false);
-        progressHolderLabel.setVisible(false);
+        consoleScrollPane.setVisible(false);
         apkFileNameLabel.setText(Main.publicAPKFileName);
         decompileFolderNameLabel.setText(Main.decompileFolderName);
 
@@ -536,7 +535,8 @@ public class Obfuscate extends javax.swing.JFrame {
             @Override
             protected void process(List<String> chunks) {
                 // This method is called on the EDT
-                progressLabel.setText(chunks.get(chunks.size() - 1));
+                consoleArea.append(chunks.get(chunks.size() - 1) + "\n");
+                consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
             }
 
             @Override
@@ -546,7 +546,8 @@ public class Obfuscate extends javax.swing.JFrame {
                 numberOfRefactoredLFields.set(refactoredFieldVariableNames.size()); // Reflects unique Local fields count
                 
                 System.out.println("Refactoring complete");
-                progressLabel.setText("Refactoring complete.");
+                consoleArea.append("Refactoring complete.");
+                consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
                 dispose();
                 new Recompile().setVisible(true);
             }
@@ -595,12 +596,12 @@ public class Obfuscate extends javax.swing.JFrame {
         loadingLabel = new javax.swing.JLabel();
         decompileFolderLabel = new javax.swing.JLabel();
         decompileFolderNameLabel = new javax.swing.JLabel();
-        progressHolderLabel = new javax.swing.JLabel();
-        progressLabel = new javax.swing.JLabel();
         blackListLabel = new javax.swing.JLabel();
         searchLabel = new javax.swing.JLabel();
         noteLabel = new javax.swing.JLabel();
         obfuscateLabel = new javax.swing.JLabel();
+        consoleScrollPane = new javax.swing.JScrollPane();
+        consoleArea = new javax.swing.JTextArea();
         jScrollPane2 = new javax.swing.JScrollPane();
         selectedPackagesTable = new javax.swing.JTable();
         addPackageButton = new javax.swing.JButton();
@@ -627,6 +628,7 @@ public class Obfuscate extends javax.swing.JFrame {
         jLabel5 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setResizable(false);
 
         obfuscatePanel.setLayout(null);
 
@@ -672,6 +674,8 @@ public class Obfuscate extends javax.swing.JFrame {
         jScrollPane1.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         jScrollPane1.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         jScrollPane1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jScrollPane1.setRowHeaderView(null);
+        jScrollPane1.setViewportView(null);
 
         availablePackagesTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -697,13 +701,12 @@ public class Obfuscate extends javax.swing.JFrame {
             }
         });
         availablePackagesTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+        availablePackagesTable.setAutoscrolls(false);
         availablePackagesTable.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         availablePackagesTable.setFillsViewportHeight(true);
-        availablePackagesTable.setPreferredSize(new java.awt.Dimension(576, 0));
         availablePackagesTable.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         availablePackagesTable.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         availablePackagesTable.setShowGrid(true);
-        availablePackagesTable.getTableHeader().setResizingAllowed(false);
         availablePackagesTable.getTableHeader().setReorderingAllowed(false);
         availablePackagesTable.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mousePressed(java.awt.event.MouseEvent evt) {
@@ -712,9 +715,9 @@ public class Obfuscate extends javax.swing.JFrame {
         });
         jScrollPane1.setViewportView(availablePackagesTable);
         if (availablePackagesTable.getColumnModel().getColumnCount() > 0) {
-            availablePackagesTable.getColumnModel().getColumn(0).setPreferredWidth(278);
-            availablePackagesTable.getColumnModel().getColumn(1).setPreferredWidth(150);
-            availablePackagesTable.getColumnModel().getColumn(2).setPreferredWidth(150);
+            availablePackagesTable.getColumnModel().getColumn(0).setPreferredWidth(276);
+            availablePackagesTable.getColumnModel().getColumn(1).setPreferredWidth(148);
+            availablePackagesTable.getColumnModel().getColumn(2).setPreferredWidth(148);
         }
 
         obfuscatePanel.add(jScrollPane1);
@@ -770,17 +773,6 @@ public class Obfuscate extends javax.swing.JFrame {
         obfuscatePanel.add(decompileFolderNameLabel);
         decompileFolderNameLabel.setBounds(650, 110, 310, 25);
 
-        progressHolderLabel.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        progressHolderLabel.setText("Progress:");
-        obfuscatePanel.add(progressHolderLabel);
-        progressHolderLabel.setBounds(490, 590, 100, 30);
-
-        progressLabel.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        progressLabel.setForeground(new java.awt.Color(255, 0, 0));
-        progressLabel.setText("Progress");
-        obfuscatePanel.add(progressLabel);
-        progressLabel.setBounds(580, 590, 680, 30);
-
         blackListLabel.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         blackListLabel.setText("Blacklist?*");
         obfuscatePanel.add(blackListLabel);
@@ -800,6 +792,17 @@ public class Obfuscate extends javax.swing.JFrame {
         obfuscateLabel.setText("Obfuscate");
         obfuscatePanel.add(obfuscateLabel);
         obfuscateLabel.setBounds(360, 400, 90, 50);
+
+        consoleArea.setEditable(false);
+        consoleArea.setBackground(new java.awt.Color(0, 0, 0));
+        consoleArea.setColumns(20);
+        consoleArea.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
+        consoleArea.setForeground(new java.awt.Color(255, 255, 255));
+        consoleArea.setRows(5);
+        consoleScrollPane.setViewportView(consoleArea);
+
+        obfuscatePanel.add(consoleScrollPane);
+        consoleScrollPane.setBounds(390, 390, 520, 160);
 
         jScrollPane2.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         jScrollPane2.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
@@ -844,8 +847,8 @@ public class Obfuscate extends javax.swing.JFrame {
         jScrollPane2.setViewportView(selectedPackagesTable);
         if (selectedPackagesTable.getColumnModel().getColumnCount() > 0) {
             selectedPackagesTable.getColumnModel().getColumn(0).setPreferredWidth(276);
-            selectedPackagesTable.getColumnModel().getColumn(1).setPreferredWidth(150);
-            selectedPackagesTable.getColumnModel().getColumn(2).setPreferredWidth(150);
+            selectedPackagesTable.getColumnModel().getColumn(1).setPreferredWidth(148);
+            selectedPackagesTable.getColumnModel().getColumn(2).setPreferredWidth(148);
         }
 
         obfuscatePanel.add(jScrollPane2);
@@ -1104,7 +1107,7 @@ public class Obfuscate extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(obfuscatePanel, javax.swing.GroupLayout.DEFAULT_SIZE, 1280, Short.MAX_VALUE)
+            .addComponent(obfuscatePanel, javax.swing.GroupLayout.PREFERRED_SIZE, 1280, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1118,12 +1121,17 @@ public class Obfuscate extends javax.swing.JFrame {
 
     private void obfuscateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_obfuscateButtonActionPerformed
         // TODO add your handling code here:
-        progressLabel.setVisible(true);
-        progressHolderLabel.setVisible(true);
         try {
             // Get the selected packages from the table
             updatePackageNamesFromTable(selectedPackagesTable);
-
+            
+            obfuscateButton.setVisible(false);
+            obfuscateLabel.setVisible(false);
+            blackListLabel.setVisible(false);
+            noteLabel.setVisible(false);
+            obfuscateCBPanel.setVisible(false);
+            consoleScrollPane.setVisible(true);
+            
             // Collect class and method names wihtin the specified package
             collectNames();
 
@@ -1394,6 +1402,8 @@ public class Obfuscate extends javax.swing.JFrame {
     private javax.swing.JCheckBox blackListLocalVariables;
     private javax.swing.JCheckBox blackListMethodsCheckBox;
     private javax.swing.JCheckBox classesCheckBox;
+    private javax.swing.JTextArea consoleArea;
+    private javax.swing.JScrollPane consoleScrollPane;
     private javax.swing.JLabel decompileFolderLabel;
     private javax.swing.JLabel decompileFolderNameLabel;
     private javax.swing.JCheckBox fieldVariablesCheckBox;
@@ -1415,8 +1425,6 @@ public class Obfuscate extends javax.swing.JFrame {
     private javax.swing.JLabel obfuscateLabel;
     private javax.swing.JPanel obfuscatePanel;
     private javax.swing.JLabel packageNameLabel;
-    private javax.swing.JLabel progressHolderLabel;
-    private javax.swing.JLabel progressLabel;
     private javax.swing.JButton removePackageButton;
     private javax.swing.JTextField searchForPackageField;
     private javax.swing.JTextField searchForPackageFieldTwo;

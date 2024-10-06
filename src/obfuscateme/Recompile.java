@@ -7,6 +7,7 @@ package obfuscateme;
 import java.awt.Desktop;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -30,16 +31,15 @@ public class Recompile extends javax.swing.JFrame {
         initComponents();
         setIconImage(Main.icon.getImage());
         this.setLocationRelativeTo(null);
-        progressHolderLabel.setVisible(false);
-        progressLabel.setVisible(false);
+        consoleScrollPane.setVisible(false);
         apkFileNameLabel.setText(Main.publicAPKFileName);
         packageNameLabel.setText(Obfuscate.publicNameOfPackage);
         numberOfClassesLabel.setText(String.valueOf(Obfuscate.numberOfRefactoedClasses));
         numberOfMethodsLabel.setText(String.valueOf(Obfuscate.numberOfRefactoredMethods));
         numberOfLFieldsLabel.setText(String.valueOf(Obfuscate.numberOfRefactoredLFields));
-        
+
         System.out.println(Obfuscate.numberOfRefactoredMethods.get());
-        
+
     }
 
     /**
@@ -62,15 +62,16 @@ public class Recompile extends javax.swing.JFrame {
         numberOfClassesLabel = new javax.swing.JLabel();
         numberOfMethodsLabel = new javax.swing.JLabel();
         signCheckBox = new javax.swing.JCheckBox();
+        keyCheckBox = new javax.swing.JCheckBox();
         recombileButton = new javax.swing.JButton();
-        progressLabel = new javax.swing.JLabel();
-        progressHolderLabel = new javax.swing.JLabel();
         gitHubProfileButton = new javax.swing.JButton();
         loadingLabel = new javax.swing.JLabel();
         backButton = new javax.swing.JButton();
         linkedInButton = new javax.swing.JButton();
         numberOfOLFieldsLabel = new javax.swing.JLabel();
         numberOfLFieldsLabel = new javax.swing.JLabel();
+        consoleScrollPane = new javax.swing.JScrollPane();
+        consoleArea = new javax.swing.JTextArea();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("ObfuscateMe - Recompile");
@@ -86,24 +87,24 @@ public class Recompile extends javax.swing.JFrame {
         selectedAPKFileLabel.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         selectedAPKFileLabel.setText("Selected APK file:");
         recompilePanel.add(selectedAPKFileLabel);
-        selectedAPKFileLabel.setBounds(70, 90, 150, 25);
+        selectedAPKFileLabel.setBounds(70, 70, 150, 25);
 
         apkFileNameLabel.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         apkFileNameLabel.setForeground(new java.awt.Color(255, 0, 0));
         apkFileNameLabel.setText("APK file name");
         recompilePanel.add(apkFileNameLabel);
-        apkFileNameLabel.setBounds(270, 90, 340, 25);
+        apkFileNameLabel.setBounds(270, 70, 340, 25);
 
         selectedPackageNameLabel.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         selectedPackageNameLabel.setText("Selected Package(s):");
         recompilePanel.add(selectedPackageNameLabel);
-        selectedPackageNameLabel.setBounds(70, 130, 180, 25);
+        selectedPackageNameLabel.setBounds(70, 110, 180, 25);
 
         packageNameLabel.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         packageNameLabel.setForeground(new java.awt.Color(255, 0, 0));
         packageNameLabel.setText("Package Number");
         recompilePanel.add(packageNameLabel);
-        packageNameLabel.setBounds(270, 130, 340, 25);
+        packageNameLabel.setBounds(270, 110, 340, 25);
 
         numberOfOMethodsLabel.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         numberOfOMethodsLabel.setText("Number of Obfuscated Methods:");
@@ -132,8 +133,27 @@ public class Recompile extends javax.swing.JFrame {
         signCheckBox.setBorder(null);
         signCheckBox.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         signCheckBox.setFocusable(false);
+        signCheckBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                signCheckBoxActionPerformed(evt);
+            }
+        });
         recompilePanel.add(signCheckBox);
-        signCheckBox.setBounds(260, 270, 54, 24);
+        signCheckBox.setBounds(210, 270, 60, 22);
+
+        keyCheckBox.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        keyCheckBox.setText("Key");
+        keyCheckBox.setBorder(null);
+        keyCheckBox.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        keyCheckBox.setEnabled(false);
+        keyCheckBox.setFocusable(false);
+        keyCheckBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                keyCheckBoxActionPerformed(evt);
+            }
+        });
+        recompilePanel.add(keyCheckBox);
+        keyCheckBox.setBounds(290, 270, 60, 22);
 
         recombileButton.setText("Recompile");
         recombileButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -144,18 +164,7 @@ public class Recompile extends javax.swing.JFrame {
             }
         });
         recompilePanel.add(recombileButton);
-        recombileButton.setBounds(220, 300, 148, 46);
-
-        progressLabel.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        progressLabel.setForeground(new java.awt.Color(255, 0, 0));
-        progressLabel.setText("Progress");
-        recompilePanel.add(progressLabel);
-        progressLabel.setBounds(270, 350, 290, 25);
-
-        progressHolderLabel.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        progressHolderLabel.setText("Progress:");
-        recompilePanel.add(progressHolderLabel);
-        progressHolderLabel.setBounds(180, 350, 100, 25);
+        recombileButton.setBounds(220, 320, 148, 46);
 
         gitHubProfileButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/obfuscateme/img/github-48.png"))); // NOI18N
         gitHubProfileButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -166,7 +175,7 @@ public class Recompile extends javax.swing.JFrame {
             }
         });
         recompilePanel.add(gitHubProfileButton);
-        gitHubProfileButton.setBounds(20, 410, 50, 50);
+        gitHubProfileButton.setBounds(20, 430, 50, 50);
 
         loadingLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/obfuscateme/img/loading.gif"))); // NOI18N
         recompilePanel.add(loadingLabel);
@@ -175,13 +184,14 @@ public class Recompile extends javax.swing.JFrame {
 
         backButton.setText("Back to main page");
         backButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        backButton.setFocusable(false);
         backButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 backButtonActionPerformed(evt);
             }
         });
         recompilePanel.add(backButton);
-        backButton.setBounds(450, 410, 150, 50);
+        backButton.setBounds(450, 430, 150, 50);
 
         linkedInButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/obfuscateme/img/linkedin.png"))); // NOI18N
         linkedInButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -192,7 +202,7 @@ public class Recompile extends javax.swing.JFrame {
             }
         });
         recompilePanel.add(linkedInButton);
-        linkedInButton.setBounds(80, 410, 50, 50);
+        linkedInButton.setBounds(80, 430, 50, 50);
 
         numberOfOLFieldsLabel.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         numberOfOLFieldsLabel.setText("Number of Obfuscated L.Fields:");
@@ -205,6 +215,17 @@ public class Recompile extends javax.swing.JFrame {
         recompilePanel.add(numberOfLFieldsLabel);
         numberOfLFieldsLabel.setBounds(380, 240, 50, 30);
 
+        consoleArea.setEditable(false);
+        consoleArea.setBackground(new java.awt.Color(0, 0, 0));
+        consoleArea.setColumns(20);
+        consoleArea.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
+        consoleArea.setForeground(new java.awt.Color(255, 255, 255));
+        consoleArea.setRows(5);
+        consoleScrollPane.setViewportView(consoleArea);
+
+        recompilePanel.add(consoleScrollPane);
+        consoleScrollPane.setBounds(40, 150, 520, 160);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -214,7 +235,7 @@ public class Recompile extends javax.swing.JFrame {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(recompilePanel, javax.swing.GroupLayout.PREFERRED_SIZE, 472, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(recompilePanel, javax.swing.GroupLayout.PREFERRED_SIZE, 495, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, Short.MAX_VALUE))
         );
 
@@ -235,32 +256,51 @@ public class Recompile extends javax.swing.JFrame {
         // TODO add your handling code here:
         dispose();
         new Main().setVisible(true);
-        
-        
-        
+
+
     }//GEN-LAST:event_backButtonActionPerformed
 
     private void linkedInButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_linkedInButtonActionPerformed
         // TODO add your handling code here:
         Main.openWebpage("https://www.linkedin.com/in/abdalhaleem-altamimi-074b5123a/");
     }//GEN-LAST:event_linkedInButtonActionPerformed
-    
+
+    private void signCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_signCheckBoxActionPerformed
+        // TODO add your handling code here:
+        if (signCheckBox.isSelected()) {
+            keyCheckBox.setEnabled(true);
+        } else {
+            keyCheckBox.setEnabled(false);
+            keyCheckBox.setSelected(false);
+        }
+    }//GEN-LAST:event_signCheckBoxActionPerformed
+
+    private void keyCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_keyCheckBoxActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_keyCheckBoxActionPerformed
+
     private void executeApktool() {
         JFileChooser fileChooser = new JFileChooser(System.getProperty("user.dir"));
         fileChooser.setAcceptAllFileFilterUsed(false);
-        fileChooser.setDialogTitle("Specify a file to save");  
-        fileChooser.setSelectedFile(new File(Main.publicAPKFileName + ".apk")); // Suggest a file name
+        fileChooser.setDialogTitle("Specify a file to save");
+        
+        // Get the current file name from Main.publicAPKFileName
+        String originalFileName = Main.publicAPKFileName;
+        if (originalFileName.endsWith(".apk")) {
+            originalFileName = originalFileName.substring(0, originalFileName.length() - 4); // Remove ".apk"
+        }
+        fileChooser.setSelectedFile(new File(originalFileName + "_obfuscated.apk")); // Suggest a file name
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 
         // Show save dialog; this method does not return until the dialog is closed
         int userSelection = fileChooser.showSaveDialog(null);
 
         if (userSelection == JFileChooser.APPROVE_OPTION) {
-            signCheckBox.setEnabled(false);
+            signCheckBox.setVisible(false);
+            keyCheckBox.setVisible(false);
             recombileButton.setEnabled(false);
             fileToSave = fileChooser.getSelectedFile();
-            progressHolderLabel.setVisible(true);
-            progressLabel.setVisible(true);
+            consoleScrollPane.setVisible(true);
             backButton.setEnabled(false);
             System.out.println("Save as file: " + fileToSave.getAbsolutePath());
             loadingLabel.setVisible(true);
@@ -270,10 +310,8 @@ public class Recompile extends javax.swing.JFrame {
             Path sourceDirectory = Paths.get(Main.decompiledApkPath);
 
             ProcessBuilder processBuilder = new ProcessBuilder(
-                "java", "-jar", apkToolPath, "b", sourceDirectory.toAbsolutePath().toString(), "-o", fileToSave.getAbsolutePath()
+                    "java", "-jar", apkToolPath, "b", sourceDirectory.toAbsolutePath().toString(), "-o", fileToSave.getAbsolutePath()
             );
-            
-            
 
             processBuilder.redirectErrorStream(true);
             startRecompilationWorker(processBuilder);
@@ -287,16 +325,14 @@ public class Recompile extends javax.swing.JFrame {
     }
 
     private void startRecompilationWorker(ProcessBuilder processBuilder) {
-         SwingWorker<Boolean, String> worker = new SwingWorker<Boolean, String>() {
+        SwingWorker<Boolean, String> worker = new SwingWorker<Boolean, String>() {
             @Override
             protected Boolean doInBackground() throws Exception {
                 Process process = processBuilder.start();
                 boolean isErrorCaptured = false;
 
+                try (BufferedReader stdInput = new BufferedReader(new InputStreamReader(process.getInputStream())); BufferedReader stdError = new BufferedReader(new InputStreamReader(process.getErrorStream()))) {
 
-                try (BufferedReader stdInput = new BufferedReader(new InputStreamReader(process.getInputStream()));
-                     BufferedReader stdError = new BufferedReader(new InputStreamReader(process.getErrorStream()))) {
-                    
                     String line;
                     while ((line = stdInput.readLine()) != null) {
                         publish(line); // Publish standard output lines
@@ -318,17 +354,16 @@ public class Recompile extends javax.swing.JFrame {
 
             @Override
             protected void process(List<String> chunks) {
-                progressHolderLabel.setVisible(true);
-                progressHolderLabel.setEnabled(true);
-                progressLabel.setVisible(true);
-                progressLabel.setEnabled(true);
+                consoleScrollPane.setVisible(true);
                 for (String line : chunks) {
                     if (line.startsWith("I:")) {
                         String cleanLine = line.substring(line.indexOf("I:") + 2).trim();
-                        progressLabel.setText(cleanLine);
+                        consoleArea.append(cleanLine + "\n");
+                        consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
                     } else if (line.startsWith("ERROR:")) {
                         String errorMessage = line.substring("ERROR:".length()).trim();
-                        progressLabel.setText(errorMessage);  // You might want to show this differently or log it
+                        consoleArea.append(errorMessage + "\n");  // You might want to show this differently or log it
+                        consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
                     }
                 }
             }
@@ -339,21 +374,21 @@ public class Recompile extends javax.swing.JFrame {
                     boolean success = get();
                     if (success) {
                         //JOptionPane.showMessageDialog(null, "Recompilation completed successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
-                        progressLabel.setText("Recompilation completed successfully.");
+                        consoleArea.append("Recompilation completed successfully.\n");
+                        consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
                         // Additional actions upon successful recompilation
-                        
-                        if (signCheckBox.isSelected()){
+
+                        if (signCheckBox.isSelected()) {
                             signApkFile(fileToSave);
-                            
-                        }
-                        else{
+
+                        } else {
                             backButton.setEnabled(true);
                             loadingLabel.setVisible(false);
                             int response = JOptionPane.showConfirmDialog(null,
-                            "Do you want to open the directory of the APK file?",
-                            "Open APK Directory",
-                            JOptionPane.YES_NO_OPTION,
-                            JOptionPane.WARNING_MESSAGE
+                                    "Do you want to open the directory of the APK file?",
+                                    "Open APK Directory",
+                                    JOptionPane.YES_NO_OPTION,
+                                    JOptionPane.WARNING_MESSAGE
                             );
                             if (response == JOptionPane.YES_OPTION) {
                                 // If yes, open the directory
@@ -366,27 +401,24 @@ public class Recompile extends javax.swing.JFrame {
 
                             }
                             int response1 = JOptionPane.showConfirmDialog(null,
-                            "Do you want to remove the folder of the decompiled APK file?",
-                            "Remove decompiled directory",
-                            JOptionPane.YES_NO_OPTION,
-                            JOptionPane.WARNING_MESSAGE
+                                    "Do you want to remove the folder of the decompiled APK file?",
+                                    "Remove decompiled directory",
+                                    JOptionPane.YES_NO_OPTION,
+                                    JOptionPane.WARNING_MESSAGE
                             );
                             if (response1 == JOptionPane.YES_OPTION) {
                                 // If yes, delete the directory
                                 boolean deleted = Main.deleteDirectory(Main.outputDirFile);
                                 if (!deleted) {
                                     JOptionPane.showMessageDialog(null, "Failed to delete existing directory.", "Error", JOptionPane.ERROR_MESSAGE);
-                                }
-                                else{
-                                    progressLabel.setText("Removed decompiled directiry");
+                                } else {
+                                    consoleArea.append("Removed decompiled directiry\n");
+                                    consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
                                 }
 
                             }
                         }
-                        
-                        
-                        
-                        
+
                     } else {
                         System.out.println("Error during recompilation:");
                         if (errorMessages.isEmpty()) {
@@ -398,23 +430,186 @@ public class Recompile extends javax.swing.JFrame {
                         dispose();
                         new Obfuscate().setVisible(true);
                     }
-                    
+
                 } catch (InterruptedException | ExecutionException e) {
                     JOptionPane.showMessageDialog(null, "An error occurred during recompilation.", "Error", JOptionPane.ERROR_MESSAGE);
-                    e.printStackTrace();
                 }
             }
         };
         // Start the SwingWorker
         worker.execute();
     }
-    
-    
+
     private void signApkFile(File apkFile) {
-        progressLabel.setText("Signing APK file...");
+        consoleArea.append("Signing APK file...\n");
+        consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
+        String uberApkSignerPath = new File("src/obfuscateme/uber-apk-signer.jar").getAbsolutePath();
+        ProcessBuilder processBuilder;
+
+        if (!keyCheckBox.isSelected()) {
+            // Auto-sign without a custom key if checkbox is not selected
+            processBuilder = new ProcessBuilder(
+                    "java", "-jar", uberApkSignerPath, "--apks", apkFile.getAbsolutePath()
+            );
+        } else {
+            // Use JFileChooser to let the user select the keystore file
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setDialogTitle("Select Keystore File");
+
+            int userSelection = fileChooser.showOpenDialog(null); // Show the file chooser
+
+            if (userSelection == JFileChooser.APPROVE_OPTION) {
+                File keystoreFile = fileChooser.getSelectedFile();
+                String keystorePath = keystoreFile.getAbsolutePath(); // Get the selected keystore path
+
+                // Prompt the user for key alias, keystore password, and key password
+                String keyAlias = JOptionPane.showInputDialog("Enter the key alias:");
+                String keystorePassword = JOptionPane.showInputDialog("Enter the keystore password:");
+                String keyPassword = JOptionPane.showInputDialog("Enter the key password:");
+
+                if (keyAlias != null && keystorePassword != null && keyPassword != null) {
+                    // Build the process to sign with the provided key details
+                    processBuilder = new ProcessBuilder(
+                            "java", "-jar", uberApkSignerPath,
+                            "--apks", apkFile.getAbsolutePath(),
+                            "--ks", keystorePath,
+                            "--ksAlias", keyAlias,
+                            "--ksPass", keystorePassword,
+                            "--ksKeyPass", keyPassword
+                    );
+                } else {
+                    // User canceled input, show options to retry, cancel, or auto-sign
+                    handleUserCancel(apkFile);
+                    return; // Exit the method after handling user decision
+                }
+            } else {
+                // User canceled keystore selection, show options to retry, cancel, or auto-sign
+                handleUserCancel(apkFile);
+                return; // Exit the method after handling user decision
+            }
+        }
+
+        // Continue with the APK signing process if a process builder is successfully created
+        processBuilder.redirectErrorStream(true);
+
+        SwingWorker<Boolean, String> worker = new SwingWorker<Boolean, String>() {
+            @Override
+            protected Boolean doInBackground() throws Exception {
+                Process process = processBuilder.start();
+
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        publish(line); // Publish progress data
+                    }
+                }
+                int exitCode = process.waitFor();
+                return exitCode == 0;
+            }
+
+            @Override
+            protected void process(List<String> chunks) {
+                for (String line : chunks) {
+                    if (line.startsWith("I:") || line.startsWith("V:")) { // Filter informational or verbose messages
+                        String cleanLine = line.substring(2).trim(); // Remove prefix and trim
+                        consoleArea.append(cleanLine + "\n"); // Update the progress label
+                        consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
+                    }
+                }
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    boolean success = get();
+                    if (success) {
+                        consoleArea.append("APK signing completed successfully.\n");
+                        consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
+                        loadingLabel.setVisible(false);
+                        backButton.setEnabled(true);
+
+                        int response = JOptionPane.showConfirmDialog(null,
+                                "Do you want to open the directory of the APK file?",
+                                "Open APK Directory",
+                                JOptionPane.YES_NO_OPTION,
+                                JOptionPane.WARNING_MESSAGE
+                        );
+                        if (response == JOptionPane.YES_OPTION) {
+                            File directory = fileToSave.getParentFile();
+                            try {
+                                Desktop.getDesktop().open((directory));
+                            } catch (IOException e) {
+                                JOptionPane.showMessageDialog(null, "An error occurred while trying to open the directory.");
+                            }
+                        }
+
+                        int response1 = JOptionPane.showConfirmDialog(null,
+                                "Do you want to remove the folder of the decompiled APK file?",
+                                "Remove decompiled directory",
+                                JOptionPane.YES_NO_OPTION,
+                                JOptionPane.WARNING_MESSAGE
+                        );
+                        if (response1 == JOptionPane.YES_OPTION) {
+                            boolean deleted = Main.deleteDirectory(Main.outputDirFile);
+                            if (!deleted) {
+                                JOptionPane.showMessageDialog(null, "Failed to delete existing directory.", "Error", JOptionPane.ERROR_MESSAGE);
+                            } else {
+                                consoleArea.append("Removed decompiled directory\n");
+                                consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
+                            }
+                        }
+                    } else {
+                        JOptionPane.showMessageDialog(null, "APK signing failed.", "Signing Failed", JOptionPane.ERROR_MESSAGE);
+                    }
+                } catch (InterruptedException | ExecutionException e) {
+                    JOptionPane.showMessageDialog(null, "An error occurred during APK signing.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        };
+
+        worker.execute(); // Execute the SwingWorker to perform APK signing in a background thread
+    }
+
+// Helper method to handle user cancel actions
+    private void handleUserCancel(File apkFile) {
+        int option = JOptionPane.showOptionDialog(
+                null,
+                "You canceled the key signing process. What would you like to do?",
+                "Sign APK",
+                JOptionPane.YES_NO_CANCEL_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                new String[]{"Cancel Signing", "Auto-sign without key", "Retry"}, // Options
+                "Cancel Signing" // Default button
+        );
+
+        switch (option) {
+            case 0: // Cancel Signing
+                consoleArea.append("Signing canceled by user.\n");
+                consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
+                break;
+
+            case 1: // Auto-sign without key
+                consoleArea.append("Auto-signing APK without a custom key...\n");
+                consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
+                signApkFileWithoutKey(apkFile); // Use default signing method
+                break;
+
+            case 2: // Retry with key
+                consoleArea.append("Retrying key signing...\n");
+                consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
+                signApkFile(apkFile);  // Retry the signing process
+                break;
+        }
+    }
+
+// Method to auto-sign APK without a custom key
+    private void signApkFileWithoutKey(File apkFile) {
+        consoleArea.append("Signing APK file without custom key...\n");
+        consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
         String uberApkSignerPath = new File("src/obfuscateme/uber-apk-signer.jar").getAbsolutePath();
         ProcessBuilder processBuilder = new ProcessBuilder(
-            "java", "-jar", uberApkSignerPath, "--apks", apkFile.getAbsolutePath()
+                "java", "-jar", uberApkSignerPath, "--apks", apkFile.getAbsolutePath()
         );
 
         processBuilder.redirectErrorStream(true);
@@ -439,68 +634,63 @@ public class Recompile extends javax.swing.JFrame {
                 for (String line : chunks) {
                     if (line.startsWith("I:") || line.startsWith("V:")) { // Filter informational or verbose messages
                         String cleanLine = line.substring(2).trim(); // Remove prefix and trim
-                        progressLabel.setText(cleanLine); // Update the progress label
+                        consoleArea.append(cleanLine + "\n"); // Update the progress label
+                        consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
                     }
                 }
             }
 
-            @Override
             protected void done() {
                 try {
                     boolean success = get();
                     if (success) {
-                        //JOptionPane.showMessageDialog(null, "APK signing completed successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
-                        progressLabel.setText("APK signing completed successfully.");
+                        consoleArea.append("APK signing completed successfully.\n");
+                        consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
                         loadingLabel.setVisible(false);
                         backButton.setEnabled(true);
-                            int response = JOptionPane.showConfirmDialog(null,
-                            "Do you want to open the directory of the APK file?",
-                            "Open APK Directory",
-                            JOptionPane.YES_NO_OPTION,
-                            JOptionPane.WARNING_MESSAGE
-                            );
-                            if (response == JOptionPane.YES_OPTION) {
-                                // If yes, open the directory
-                                File directory = fileToSave.getParentFile();
-                                try {
-                                    Desktop.getDesktop().open((directory));
-                                } catch (Exception e) {
-                                    JOptionPane.showMessageDialog(null, "An error occurred while trying to open");
-                                }
 
+                        int response = JOptionPane.showConfirmDialog(null,
+                                "Do you want to open the directory of the APK file?",
+                                "Open APK Directory",
+                                JOptionPane.YES_NO_OPTION,
+                                JOptionPane.WARNING_MESSAGE
+                        );
+                        if (response == JOptionPane.YES_OPTION) {
+                            File directory = fileToSave.getParentFile();
+                            try {
+                                Desktop.getDesktop().open((directory));
+                            } catch (IOException e) {
+                                JOptionPane.showMessageDialog(null, "An error occurred while trying to open the directory.");
                             }
-                            int response1 = JOptionPane.showConfirmDialog(null,
-                            "Do you want to remove the folder of the decompiled APK file?",
-                            "Remove decompiled directory",
-                            JOptionPane.YES_NO_OPTION,
-                            JOptionPane.WARNING_MESSAGE
-                            );
-                            if (response1 == JOptionPane.YES_OPTION) {
-                                // If yes, delete the directory
-                                boolean deleted = Main.deleteDirectory(Main.outputDirFile);
-                                if (!deleted) {
-                                    JOptionPane.showMessageDialog(null, "Failed to delete existing directory.", "Error", JOptionPane.ERROR_MESSAGE);
-                                }
-                                else{
-                                    progressLabel.setText("Removed decompiled directiry");
-                                
-                                }
+                        }
 
+                        int response1 = JOptionPane.showConfirmDialog(null,
+                                "Do you want to remove the folder of the decompiled APK file?",
+                                "Remove decompiled directory",
+                                JOptionPane.YES_NO_OPTION,
+                                JOptionPane.WARNING_MESSAGE
+                        );
+                        if (response1 == JOptionPane.YES_OPTION) {
+                            boolean deleted = Main.deleteDirectory(Main.outputDirFile);
+                            if (!deleted) {
+                                JOptionPane.showMessageDialog(null, "Failed to delete existing directory.", "Error", JOptionPane.ERROR_MESSAGE);
+                            } else {
+                                consoleArea.append("Removed decompiled directory\n");
+                                consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
                             }
-                        // Additional actions upon successful APK signing
+                        }
                     } else {
                         JOptionPane.showMessageDialog(null, "APK signing failed.", "Signing Failed", JOptionPane.ERROR_MESSAGE);
-                        
                     }
                 } catch (InterruptedException | ExecutionException e) {
                     JOptionPane.showMessageDialog(null, "An error occurred during APK signing.", "Error", JOptionPane.ERROR_MESSAGE);
-                    e.printStackTrace();
                 }
             }
         };
 
         worker.execute(); // Execute the SwingWorker to perform APK signing in a background thread
     }
+
     /**
      * @param args the command line arguments
      */
@@ -539,7 +729,10 @@ public class Recompile extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel apkFileNameLabel;
     private javax.swing.JButton backButton;
+    private javax.swing.JTextArea consoleArea;
+    private javax.swing.JScrollPane consoleScrollPane;
     private javax.swing.JButton gitHubProfileButton;
+    private javax.swing.JCheckBox keyCheckBox;
     private javax.swing.JButton linkedInButton;
     private javax.swing.JLabel loadingLabel;
     private javax.swing.JLabel numberOfClassesLabel;
@@ -549,8 +742,6 @@ public class Recompile extends javax.swing.JFrame {
     private javax.swing.JLabel numberOfOLFieldsLabel;
     private javax.swing.JLabel numberOfOMethodsLabel;
     private javax.swing.JLabel packageNameLabel;
-    private javax.swing.JLabel progressHolderLabel;
-    private javax.swing.JLabel progressLabel;
     private javax.swing.JButton recombileButton;
     private javax.swing.JPanel recompilePanel;
     private javax.swing.JLabel selectedAPKFileLabel;
