@@ -50,16 +50,6 @@ public class Main extends javax.swing.JFrame {
 //        progressLabel.setVisible(false);
     }
 
-    private static Image getImage(String path) {
-        java.net.URL imgURL = Main.class.getResource(path);
-        if (imgURL != null) {
-            return new ImageIcon(imgURL).getImage();
-        } else {
-            System.err.println("Couldn't find file: " + path);
-            return null;
-        }
-    }
-
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -254,8 +244,6 @@ public class Main extends javax.swing.JFrame {
                 // Create the output directory path using the selected directory and APK file name
                 outputDirectory = Paths.get(selectedDirectory.getAbsolutePath(), apkBaseName);
 
-                System.out.println("Selected output directory: " + outputDirectory);
-
                 // Check if the directory exists only if user approves a directory
                 outputDirFile = outputDirectory.toFile(); // Convert Path to File
 
@@ -286,11 +274,14 @@ public class Main extends javax.swing.JFrame {
 
             case JFileChooser.CANCEL_OPTION -> {
                 // User canceled the operation
-                System.out.println("File selection was canceled by the user.");
+                 consoleArea.append("File selection was canceled by the user.");
+                 consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
                 return; // Stop further execution if the user cancels
             }
-            default -> // If there's some other unexpected result
-                System.out.println("An unexpected error occurred.");
+            default -> {// If there's some other unexpected result
+                consoleArea.append("An unexpected error occurred.");
+                consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
+            }
         }
     }//GEN-LAST:event_decompileButtonActionPerformed
 
@@ -354,7 +345,6 @@ public class Main extends javax.swing.JFrame {
                 try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
                     String line;
                     while ((line = reader.readLine()) != null) {
-//                        System.out.println(line); // Print the apktool output to the console
                         String cleanLine = "";
                         if (line.startsWith("I:")) {
                         // Remove the "I:" prefix and any leading whitespace
@@ -381,6 +371,8 @@ public class Main extends javax.swing.JFrame {
                         decompileFolderName = String.valueOf(outputDirectory.getFileName());
                         
                         loadingLabel.setVisible(false);
+                        consoleArea.append("Decompilation completed successfully.\n");
+                        consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
                         // Show the success message
                         JOptionPane.showMessageDialog(null, "Decompilation completed successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
                         loadingLabel.setVisible(true);

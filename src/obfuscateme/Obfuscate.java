@@ -76,7 +76,6 @@ public class Obfuscate extends javax.swing.JFrame {
             writer.write(line);
             writer.newLine();
         } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
@@ -153,7 +152,6 @@ public class Obfuscate extends javax.swing.JFrame {
             });
 
         } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
@@ -465,8 +463,7 @@ public class Obfuscate extends javax.swing.JFrame {
     private void refactorNames() {
         SwingWorker<Void, String> worker = new SwingWorker<Void, String>() {
             @Override
-            protected Void doInBackground() throws Exception {
-                System.out.println("Starting SwingWorker");
+            protected Void doInBackground() throws Exception {               
                 Path decompiledDir = Paths.get(Main.decompiledApkPath);
 
                 // Refactor within targeted packages
@@ -1229,7 +1226,6 @@ public class Obfuscate extends javax.swing.JFrame {
 //            selectedPackageNames.add(packageName);
 //        }
         if (selectedRowView != -1) { // Ensure there is a selection
-            System.out.println("X: " + selectedPackageNames);
             // Convert the index of the view's row to the model's row index
             int selectedRowModel = availablePackagesTable.convertRowIndexToModel(selectedRowView);
 

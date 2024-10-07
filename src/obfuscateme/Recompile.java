@@ -39,8 +39,6 @@ public class Recompile extends javax.swing.JFrame {
         numberOfMethodsLabel.setText(String.valueOf(Obfuscate.numberOfRefactoredMethods));
         numberOfLFieldsLabel.setText(String.valueOf(Obfuscate.numberOfRefactoredLFields));
 
-        System.out.println(Obfuscate.numberOfRefactoredMethods.get());
-
     }
 
     /**
@@ -284,7 +282,7 @@ public class Recompile extends javax.swing.JFrame {
         JFileChooser fileChooser = new JFileChooser(System.getProperty("user.dir"));
         fileChooser.setAcceptAllFileFilterUsed(false);
         fileChooser.setDialogTitle("Specify a file to save");
-        
+
         // Get the current file name from Main.publicAPKFileName
         String originalFileName = Main.publicAPKFileName;
         if (originalFileName.endsWith(".apk")) {
@@ -309,7 +307,8 @@ public class Recompile extends javax.swing.JFrame {
             fileToSave = fileChooser.getSelectedFile();
             consoleScrollPane.setVisible(true);
             backButton.setEnabled(false);
-            System.out.println("Save as file: " + fileToSave.getAbsolutePath());
+            consoleArea.append("Save as file: " + fileToSave.getAbsolutePath());
+            consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
             loadingLabel.setVisible(true);
 
             // Proceed with the recompilation using the selected file path
@@ -325,7 +324,8 @@ public class Recompile extends javax.swing.JFrame {
         } else {
             // User canceled the dialog; you might want to handle this case.
             loadingLabel.setVisible(false);
-            System.out.println("User canceled save operation. Recompilation not started.");
+            consoleArea.append("User canceled save operation. Recompilation not started.");
+            consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
             backButton.setEnabled(true);
             signCheckBox.setEnabled(true);
         }
@@ -427,12 +427,17 @@ public class Recompile extends javax.swing.JFrame {
                         }
 
                     } else {
-                        System.out.println("Error during recompilation:");
+                        consoleArea.append("Error during recompilation:\n");
+                        consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
+
                         if (errorMessages.isEmpty()) {
-                            System.out.println("No error messages were captured.");
+                            consoleArea.append("No error messages were captured.\n");
                         } else {
-                            errorMessages.forEach(System.out::println);
+                            errorMessages.forEach(errorMessage -> consoleArea.append(errorMessage + "\n"));
                         }
+
+                        consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
+                        
                         JOptionPane.showMessageDialog(null, "Recompilation failed. Check the console for details.", "Recompilation Failed", JOptionPane.ERROR_MESSAGE);
                         dispose();
                         new Obfuscate().setVisible(true);
