@@ -5,11 +5,12 @@
 package obfuscateme;
 
 import java.awt.Desktop;
-import java.awt.Image;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -404,6 +405,8 @@ public class Main extends javax.swing.JFrame {
                     } else {
                         // Handle decompilation failure
                         JOptionPane.showMessageDialog(null, "Decompilation failed.", "Decompilation Failed", JOptionPane.ERROR_MESSAGE);
+                        consoleArea.append("Decompilation failed.\n");
+                        consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
                         selectAPKFileButton.setEnabled(true);
                         decompileButton.setEnabled(true);
                     }
@@ -425,8 +428,7 @@ public class Main extends javax.swing.JFrame {
             try {
                 URI uri = new URI(urlString);
                 desktop.browse(uri);
-            } catch (Exception e) {
-                e.printStackTrace();
+            } catch (IOException | URISyntaxException e) {
             }
         }
     }
@@ -459,10 +461,8 @@ public class Main extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new Main().setVisible(true);
-            }
+        java.awt.EventQueue.invokeLater(() -> {
+            new Main().setVisible(true);
         });
     }
 

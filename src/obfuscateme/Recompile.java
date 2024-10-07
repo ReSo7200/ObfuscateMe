@@ -29,6 +29,7 @@ public class Recompile extends javax.swing.JFrame {
      * Creates new form Recompile
      */
     public Recompile() {
+        this.errorMessages = new ArrayList<>();
         initComponents();
         setIconImage(Main.icon.getImage());
         this.setLocationRelativeTo(null);
@@ -146,11 +147,6 @@ public class Recompile extends javax.swing.JFrame {
         keyCheckBox.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         keyCheckBox.setEnabled(false);
         keyCheckBox.setFocusable(false);
-        keyCheckBox.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                keyCheckBoxActionPerformed(evt);
-            }
-        });
         recompilePanel.add(keyCheckBox);
         keyCheckBox.setBounds(290, 270, 60, 22);
 
@@ -255,8 +251,6 @@ public class Recompile extends javax.swing.JFrame {
         // TODO add your handling code here:
         dispose();
         new Main().setVisible(true);
-
-
     }//GEN-LAST:event_backButtonActionPerformed
 
     private void linkedInButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_linkedInButtonActionPerformed
@@ -273,10 +267,6 @@ public class Recompile extends javax.swing.JFrame {
             keyCheckBox.setSelected(false);
         }
     }//GEN-LAST:event_signCheckBoxActionPerformed
-
-    private void keyCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_keyCheckBoxActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_keyCheckBoxActionPerformed
 
     private void executeApktool() {
         JFileChooser fileChooser = new JFileChooser(System.getProperty("user.dir"));
@@ -307,7 +297,7 @@ public class Recompile extends javax.swing.JFrame {
             fileToSave = fileChooser.getSelectedFile();
             consoleScrollPane.setVisible(true);
             backButton.setEnabled(false);
-            consoleArea.append("Save as file: " + fileToSave.getAbsolutePath());
+            consoleArea.append("Save as file: " + fileToSave.getAbsolutePath() + "\n");
             consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
             loadingLabel.setVisible(true);
 
@@ -418,8 +408,9 @@ public class Recompile extends javax.swing.JFrame {
                                 boolean deleted = Main.deleteDirectory(Main.outputDirFile);
                                 if (!deleted) {
                                     JOptionPane.showMessageDialog(null, "Failed to delete existing directory.", "Error", JOptionPane.ERROR_MESSAGE);
+                                    consoleArea.append("Failed to delete existing directory.\n");
                                 } else {
-                                    consoleArea.append("Removed decompiled directiry\n");
+                                    consoleArea.append("Removed decompiled directiry.\n");
                                     consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
                                 }
 
@@ -563,20 +554,30 @@ public class Recompile extends javax.swing.JFrame {
                                 JOptionPane.YES_NO_OPTION,
                                 JOptionPane.WARNING_MESSAGE
                         );
+                        
                         if (response1 == JOptionPane.YES_OPTION) {
                             boolean deleted = Main.deleteDirectory(Main.outputDirFile);
                             if (!deleted) {
                                 JOptionPane.showMessageDialog(null, "Failed to delete existing directory.", "Error", JOptionPane.ERROR_MESSAGE);
+                                consoleArea.append("Failed to delete existing directory.\n");
                             } else {
-                                consoleArea.append("Removed decompiled directory\n");
-                                consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
+                                consoleArea.append("Removed decompiled directory.\nFeel free to close the tool or get back to the main menu.\n");
                             }
                         }
+                        else{
+                            consoleArea.append("Feel free to close the tool or get back to the main menu.\n");
+                        }
+                        
+                        consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
                     } else {
                         JOptionPane.showMessageDialog(null, "APK signing failed.", "Signing Failed", JOptionPane.ERROR_MESSAGE);
+                        consoleArea.append("APK signing failed.\n");
+                        consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
                     }
                 } catch (InterruptedException | ExecutionException e) {
                     JOptionPane.showMessageDialog(null, "An error occurred during APK signing.", "Error", JOptionPane.ERROR_MESSAGE);
+                    consoleArea.append("An error occurred during APK signing.\n");
+                    consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
                 }
             }
         };
@@ -765,6 +766,6 @@ public class Recompile extends javax.swing.JFrame {
     private javax.swing.JLabel title;
     // End of variables declaration//GEN-END:variables
     public File fileToSave;
-    private List<String> errorMessages = new ArrayList<>();
+    private final List<String> errorMessages;
 
 }

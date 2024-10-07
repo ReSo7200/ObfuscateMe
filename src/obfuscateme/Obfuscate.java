@@ -19,7 +19,6 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -50,6 +49,7 @@ public class Obfuscate extends javax.swing.JFrame {
      * Creates new form Obfuscate
      */
     public Obfuscate() {
+        this.methodUsageMap = new HashMap<>();
         initComponents();
         setIconImage(Main.icon.getImage());
         this.setLocationRelativeTo(null);
@@ -364,7 +364,7 @@ public class Obfuscate extends javax.swing.JFrame {
     }
 
     private void logCollectedNamesForObfuscation(String packageName, Map<String, String> classMap, Map<String, String> methodMap, Map<String, String> fieldVariableMap, Path basePath) throws IOException {
-        Path logFilePath = basePath.resolve(packageName.replace('.', '_') + "_for_obfuscation.txt");
+        Path logFilePath = basePath.resolve("../" + packageName.replace('.', '_') + "_for_obfuscation.txt");
         try (BufferedWriter writer = Files.newBufferedWriter(logFilePath)) {
             writer.write("Classes to be obfuscated:\n");
             for (String originalClass : classMap.keySet()) {
@@ -433,7 +433,6 @@ public class Obfuscate extends javax.swing.JFrame {
                 excludedClasses.add(line.trim());
             }
         } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
@@ -444,7 +443,6 @@ public class Obfuscate extends javax.swing.JFrame {
                 excludedMethods.add(line.trim());
             }
         } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
@@ -455,7 +453,6 @@ public class Obfuscate extends javax.swing.JFrame {
                 excludedMethods.add(line.trim());
             }
         } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
@@ -519,7 +516,6 @@ public class Obfuscate extends javax.swing.JFrame {
                                             }
                                         });
                                     } catch (IOException e) {
-                                        e.printStackTrace();
                                     }
                                 }
                             });
@@ -564,7 +560,6 @@ public class Obfuscate extends javax.swing.JFrame {
                                     Files.writeString(file, content);  // Write changes back to the file
                                 }
                             } catch (IOException e) {
-                                e.printStackTrace();
                             }
                         });
 
@@ -614,6 +609,7 @@ public class Obfuscate extends javax.swing.JFrame {
                         }
                     }
                     dispose();
+                    new Main().setVisible(true);
                 }
 
             }
@@ -1218,13 +1214,7 @@ public class Obfuscate extends javax.swing.JFrame {
         int selectedRowView = availablePackagesTable.getSelectedRow();
 
         enableArrows();
-        //selectedPackageNames.clear(); // Clear the previous selections
 
-//        for (int viewIndex : selectedRowsViewIndices) {
-//            int modelIndex = availablePackagesTable.convertRowIndexToModel(viewIndex);
-//            String packageName = (String) availablePackagesTable.getModel().getValueAt(modelIndex, 0);
-//            selectedPackageNames.add(packageName);
-//        }
         if (selectedRowView != -1) { // Ensure there is a selection
             // Convert the index of the view's row to the model's row index
             int selectedRowModel = availablePackagesTable.convertRowIndexToModel(selectedRowView);
@@ -1265,16 +1255,13 @@ public class Obfuscate extends javax.swing.JFrame {
                                         }
                                     }
                                 } catch (IOException e) {
-                                    e.printStackTrace();
                                 }
                             });
                         } catch (IOException e) {
-                            e.printStackTrace();
                         }
                     }
                 });
             } catch (IOException e) {
-                e.printStackTrace();
             }
 
             // Now, write the class and method names to a text file
@@ -1453,10 +1440,8 @@ public class Obfuscate extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new Obfuscate().setVisible(true);
-            }
+        java.awt.EventQueue.invokeLater(() -> {
+            new Obfuscate().setVisible(true);
         });
     }
 
