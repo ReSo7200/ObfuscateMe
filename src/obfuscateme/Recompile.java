@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -295,11 +296,16 @@ public class Recompile extends javax.swing.JFrame {
             numberOfLFieldsLabel.setVisible(false);
             recombileButton.setEnabled(false);
             fileToSave = fileChooser.getSelectedFile();
-            consoleScrollPane.setVisible(true);
             backButton.setEnabled(false);
-            consoleArea.append("Save as file: " + fileToSave.getAbsolutePath() + "\n");
-            consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
-            loadingLabel.setVisible(true);
+            recompilePanel.revalidate();
+            recompilePanel.repaint();
+            // Make the console visible last
+            SwingUtilities.invokeLater(() -> {
+                consoleScrollPane.setVisible(true);
+                consoleArea.append("Save as file: " + fileToSave.getAbsolutePath() + "\n");
+                consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
+                loadingLabel.setVisible(true);
+            });
 
             // Proceed with the recompilation using the selected file path
             String apkToolPath = new File("src/obfuscateme/apktool.jar").getAbsolutePath();
@@ -314,8 +320,7 @@ public class Recompile extends javax.swing.JFrame {
         } else {
             // User canceled the dialog; you might want to handle this case.
             loadingLabel.setVisible(false);
-            consoleArea.append("User canceled save operation. Recompilation not started.");
-            consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
+            consoleScrollPane.setVisible(false);
             backButton.setEnabled(true);
             signCheckBox.setEnabled(true);
         }
@@ -428,7 +433,7 @@ public class Recompile extends javax.swing.JFrame {
                         }
 
                         consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
-                        
+
                         JOptionPane.showMessageDialog(null, "Recompilation failed. Check the console for details.", "Recompilation Failed", JOptionPane.ERROR_MESSAGE);
                         dispose();
                         new Obfuscate().setVisible(true);
@@ -554,7 +559,7 @@ public class Recompile extends javax.swing.JFrame {
                                 JOptionPane.YES_NO_OPTION,
                                 JOptionPane.WARNING_MESSAGE
                         );
-                        
+
                         if (response1 == JOptionPane.YES_OPTION) {
                             boolean deleted = Main.deleteDirectory(Main.outputDirFile);
                             if (!deleted) {
@@ -563,11 +568,10 @@ public class Recompile extends javax.swing.JFrame {
                             } else {
                                 consoleArea.append("Removed decompiled directory.\nFeel free to close the tool or get back to the main menu.\n");
                             }
-                        }
-                        else{
+                        } else {
                             consoleArea.append("Feel free to close the tool or get back to the main menu.\n");
                         }
-                        
+
                         consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
                     } else {
                         JOptionPane.showMessageDialog(null, "APK signing failed.", "Signing Failed", JOptionPane.ERROR_MESSAGE);
@@ -730,7 +734,7 @@ public class Recompile extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(Recompile.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
-        
+
         //</editor-fold>
 
         /* Create and display the form */

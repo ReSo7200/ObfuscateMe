@@ -662,8 +662,6 @@ public class Obfuscate extends javax.swing.JFrame {
         searchLabel = new javax.swing.JLabel();
         noteLabel = new javax.swing.JLabel();
         obfuscateLabel = new javax.swing.JLabel();
-        consoleScrollPane = new javax.swing.JScrollPane();
-        consoleArea = new javax.swing.JTextArea();
         jScrollPane2 = new javax.swing.JScrollPane();
         selectedPackagesTable = new javax.swing.JTable();
         addPackageButton = new javax.swing.JButton();
@@ -681,6 +679,8 @@ public class Obfuscate extends javax.swing.JFrame {
         blackListFieldVariables = new javax.swing.JCheckBox();
         blackListMethodsCheckBox = new javax.swing.JCheckBox();
         blackListClassesCheckBox = new javax.swing.JCheckBox();
+        consoleScrollPane = new javax.swing.JScrollPane();
+        consoleArea = new javax.swing.JTextArea();
         linkedInButton = new javax.swing.JButton();
         backButton = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
@@ -786,7 +786,7 @@ public class Obfuscate extends javax.swing.JFrame {
         obfuscatePanel.add(jScrollPane1);
         jScrollPane1.setBounds(10, 190, 590, 150);
 
-        searchForPackageField.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        searchForPackageField.setCursor(new java.awt.Cursor(java.awt.Cursor.TEXT_CURSOR));
         obfuscatePanel.add(searchForPackageField);
         searchForPackageField.setBounds(250, 140, 190, 40);
         DefaultTableModel model = (DefaultTableModel) availablePackagesTable.getModel();
@@ -855,17 +855,6 @@ public class Obfuscate extends javax.swing.JFrame {
         obfuscateLabel.setText("Obfuscate");
         obfuscatePanel.add(obfuscateLabel);
         obfuscateLabel.setBounds(360, 400, 90, 50);
-
-        consoleArea.setEditable(false);
-        consoleArea.setBackground(new java.awt.Color(0, 0, 0));
-        consoleArea.setColumns(20);
-        consoleArea.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
-        consoleArea.setForeground(new java.awt.Color(255, 255, 255));
-        consoleArea.setRows(5);
-        consoleScrollPane.setViewportView(consoleArea);
-
-        obfuscatePanel.add(consoleScrollPane);
-        consoleScrollPane.setBounds(390, 390, 520, 160);
 
         jScrollPane2.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         jScrollPane2.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
@@ -946,7 +935,7 @@ public class Obfuscate extends javax.swing.JFrame {
         obfuscatePanel.add(searchLabelTwo);
         searchLabelTwo.setBounds(840, 140, 70, 40);
 
-        searchForPackageFieldTwo.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        searchForPackageFieldTwo.setCursor(new java.awt.Cursor(java.awt.Cursor.TEXT_CURSOR));
         obfuscatePanel.add(searchForPackageFieldTwo);
         searchForPackageFieldTwo.setBounds(920, 140, 190, 40);
         DefaultTableModel modelx = (DefaultTableModel) selectedPackagesTable.getModel();
@@ -1120,6 +1109,17 @@ public class Obfuscate extends javax.swing.JFrame {
         obfuscatePanel.add(blackListCBPanel);
         blackListCBPanel.setBounds(470, 460, 410, 50);
 
+        consoleArea.setEditable(false);
+        consoleArea.setBackground(new java.awt.Color(0, 0, 0));
+        consoleArea.setColumns(20);
+        consoleArea.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
+        consoleArea.setForeground(new java.awt.Color(255, 255, 255));
+        consoleArea.setRows(5);
+        consoleScrollPane.setViewportView(consoleArea);
+
+        obfuscatePanel.add(consoleScrollPane);
+        consoleScrollPane.setBounds(390, 390, 520, 160);
+
         linkedInButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/obfuscateme/img/linkedin.png"))); // NOI18N
         linkedInButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         linkedInButton.setFocusable(false);
@@ -1168,6 +1168,7 @@ public class Obfuscate extends javax.swing.JFrame {
 
         addSaltCheckBox.setText("Random Salt?");
         addSaltCheckBox.setEnabled(false);
+        addSaltCheckBox.setFocusable(false);
         obfuscatePanel.add(addSaltCheckBox);
         addSaltCheckBox.setBounds(610, 520, 110, 20);
 

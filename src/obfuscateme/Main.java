@@ -47,8 +47,6 @@ public class Main extends javax.swing.JFrame {
         // Center the frame on the screen.
         this.setLocationRelativeTo(null);
         consoleScrollPane.setVisible(false);
-//        progressHolderLabel.setVisible(false);
-//        progressLabel.setVisible(false);
     }
 
     /**
