@@ -599,22 +599,25 @@ public class Recompile extends javax.swing.JFrame {
         );
 
         switch (option) {
-            case 0: // Cancel Signing
+            case 0 -> {
+                // Cancel Signing
                 consoleArea.append("Signing canceled by user.\n");
                 consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
-                break;
+            }
 
-            case 1: // Auto-sign without key
+            case 1 -> {
+                // Auto-sign without key
                 consoleArea.append("Auto-signing APK without a custom key...\n");
                 consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
                 signApkFileWithoutKey(apkFile); // Use default signing method
-                break;
+            }
 
-            case 2: // Retry with key
+            case 2 -> {
+                // Retry with key
                 consoleArea.append("Retrying key signing...\n");
                 consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
                 signApkFile(apkFile);  // Retry the signing process
-                break;
+            }
         }
     }
 
@@ -723,22 +726,16 @@ public class Recompile extends javax.swing.JFrame {
                     break;
                 }
             }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Recompile.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Recompile.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Recompile.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(Recompile.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
+        
+        //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new Recompile().setVisible(true);
-            }
+        java.awt.EventQueue.invokeLater(() -> {
+            new Recompile().setVisible(true);
         });
     }
 

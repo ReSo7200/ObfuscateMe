@@ -156,36 +156,36 @@ public class Obfuscate extends javax.swing.JFrame {
     }
 
     // Debug purposes
-    private void writeClassNamesToFile(Map<String, Set<String>> packageClasses, Path decompiledDir) throws IOException {
-        for (Map.Entry<String, Set<String>> entry : packageClasses.entrySet()) {
-            String packageName = entry.getKey();
-            Set<String> classNames = entry.getValue();
-            Path filePath = decompiledDir.resolve(packageName + "_classes.txt");
-
-            try (BufferedWriter writer = Files.newBufferedWriter(filePath)) {
-                for (String className : classNames) {
-                    writer.write(className);
-                    writer.newLine();
-                }
-            }
-        }
-    }
-
-    // Debug purposes
-    private void writeMethodNamesToFile(Map<String, Set<String>> packageMethods, Path decompiledDir) throws IOException {
-        for (Map.Entry<String, Set<String>> entry : packageMethods.entrySet()) {
-            String packageName = entry.getKey();
-            Set<String> methodNames = entry.getValue();
-            Path filePath = decompiledDir.resolve(packageName.replace('.', '_') + "_methods.txt");
-
-            try (BufferedWriter writer = Files.newBufferedWriter(filePath)) {
-                for (String methodName : methodNames) {
-                    writer.write(methodName);
-                    writer.newLine();
-                }
-            }
-        }
-    }
+//    private void writeClassNamesToFile(Map<String, Set<String>> packageClasses, Path decompiledDir) throws IOException {
+//        for (Map.Entry<String, Set<String>> entry : packageClasses.entrySet()) {
+//            String packageName = entry.getKey();
+//            Set<String> classNames = entry.getValue();
+//            Path filePath = decompiledDir.resolve(packageName + "_classes.txt");
+//
+//            try (BufferedWriter writer = Files.newBufferedWriter(filePath)) {
+//                for (String className : classNames) {
+//                    writer.write(className);
+//                    writer.newLine();
+//                }
+//            }
+//        }
+//    }
+//
+//    // Debug purposes
+//    private void writeMethodNamesToFile(Map<String, Set<String>> packageMethods, Path decompiledDir) throws IOException {
+//        for (Map.Entry<String, Set<String>> entry : packageMethods.entrySet()) {
+//            String packageName = entry.getKey();
+//            Set<String> methodNames = entry.getValue();
+//            Path filePath = decompiledDir.resolve(packageName.replace('.', '_') + "_methods.txt");
+//
+//            try (BufferedWriter writer = Files.newBufferedWriter(filePath)) {
+//                for (String methodName : methodNames) {
+//                    writer.write(methodName);
+//                    writer.newLine();
+//                }
+//            }
+//        }
+//    }
 
     public void updatePackageNamesFromTable(JTable table) {
         int columnIndex = 0;  // column index of the package names
@@ -1427,15 +1427,12 @@ public class Obfuscate extends javax.swing.JFrame {
                     break;
                 }
             }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Obfuscate.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Obfuscate.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Obfuscate.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(Obfuscate.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
+        //</editor-fold>
+        
         //</editor-fold>
         //</editor-fold>
 
