@@ -729,11 +729,11 @@ public class Obfuscate extends javax.swing.JFrame {
         blackListClassesCheckBox = new javax.swing.JCheckBox();
         linkedInButton = new javax.swing.JButton();
         backButton = new javax.swing.JButton();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
+        hint1Label = new javax.swing.JLabel();
+        infoLabel = new javax.swing.JLabel();
+        info2Label = new javax.swing.JLabel();
+        selectedPackagesLabel = new javax.swing.JLabel();
+        availablePackagesLabel = new javax.swing.JLabel();
         addSaltCheckBox = new javax.swing.JCheckBox();
         addPrefixCheckBox = new javax.swing.JCheckBox();
         consoleScrollPane = new javax.swing.JScrollPane();
@@ -1179,30 +1179,30 @@ public class Obfuscate extends javax.swing.JFrame {
         obfuscatePanel.add(backButton);
         backButton.setBounds(1110, 610, 150, 60);
 
-        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jLabel1.setText("Select the packages to be obfusacted");
-        obfuscatePanel.add(jLabel1);
-        jLabel1.setBounds(510, 40, 260, 40);
+        hint1Label.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        hint1Label.setText("Select the packages to be obfusacted");
+        obfuscatePanel.add(hint1Label);
+        hint1Label.setBounds(510, 40, 260, 40);
 
-        jLabel3.setFont(new java.awt.Font("Segoe UI", 2, 14)); // NOI18N
-        jLabel3.setText("Developed by Abdalhaleem Altamimi - @ReSo7200");
-        obfuscatePanel.add(jLabel3);
-        jLabel3.setBounds(230, 650, 340, 20);
+        infoLabel.setFont(new java.awt.Font("Segoe UI", 2, 14)); // NOI18N
+        infoLabel.setText("Developed by Abdalhaleem Altamimi - @ReSo7200");
+        obfuscatePanel.add(infoLabel);
+        infoLabel.setBounds(230, 650, 340, 20);
 
-        jLabel4.setFont(new java.awt.Font("Segoe UI", 2, 12)); // NOI18N
-        jLabel4.setText("University of Bedfordshire Undergradute Project - Student ID: 2113263");
-        obfuscatePanel.add(jLabel4);
-        jLabel4.setBounds(680, 650, 380, 16);
+        info2Label.setFont(new java.awt.Font("Segoe UI", 2, 12)); // NOI18N
+        info2Label.setText("University of Bedfordshire Undergradute Project - Student ID: 2113263");
+        obfuscatePanel.add(info2Label);
+        info2Label.setBounds(680, 650, 380, 16);
 
-        jLabel2.setFont(new java.awt.Font("Segoe UI", 3, 14)); // NOI18N
-        jLabel2.setText("Selected Packages:");
-        obfuscatePanel.add(jLabel2);
-        jLabel2.setBounds(680, 170, 120, 20);
+        selectedPackagesLabel.setFont(new java.awt.Font("Segoe UI", 3, 14)); // NOI18N
+        selectedPackagesLabel.setText("Selected Packages:");
+        obfuscatePanel.add(selectedPackagesLabel);
+        selectedPackagesLabel.setBounds(680, 170, 120, 20);
 
-        jLabel5.setFont(new java.awt.Font("Segoe UI", 3, 14)); // NOI18N
-        jLabel5.setText("Avaialable Packages:");
-        obfuscatePanel.add(jLabel5);
-        jLabel5.setBounds(10, 170, 150, 20);
+        availablePackagesLabel.setFont(new java.awt.Font("Segoe UI", 3, 14)); // NOI18N
+        availablePackagesLabel.setText("Avaialable Packages:");
+        obfuscatePanel.add(availablePackagesLabel);
+        availablePackagesLabel.setBounds(10, 170, 150, 20);
 
         addSaltCheckBox.setText("Random Salt?");
         addSaltCheckBox.setEnabled(false);
@@ -1503,6 +1503,7 @@ public class Obfuscate extends javax.swing.JFrame {
     private javax.swing.JCheckBox addPrefixCheckBox;
     private javax.swing.JCheckBox addSaltCheckBox;
     private javax.swing.JLabel apkFileNameLabel;
+    private javax.swing.JLabel availablePackagesLabel;
     private javax.swing.JTable availablePackagesTable;
     private javax.swing.JButton backButton;
     private javax.swing.JPanel blackListCBPanel;
@@ -1518,11 +1519,9 @@ public class Obfuscate extends javax.swing.JFrame {
     private javax.swing.JLabel decompileFolderNameLabel;
     private javax.swing.JCheckBox fieldVariablesCheckBox;
     private javax.swing.JButton gitHubProfileButton;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel hint1Label;
+    private javax.swing.JLabel info2Label;
+    private javax.swing.JLabel infoLabel;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JButton linkedInButton;
@@ -1542,6 +1541,7 @@ public class Obfuscate extends javax.swing.JFrame {
     private javax.swing.JLabel searchLabelTwo;
     private javax.swing.JLabel selectedAPKFileLabel;
     private javax.swing.JLabel selectedPackageNameLabel;
+    private javax.swing.JLabel selectedPackagesLabel;
     private javax.swing.JTable selectedPackagesTable;
     private javax.swing.JLabel title;
     // End of variables declaration//GEN-END:variables
