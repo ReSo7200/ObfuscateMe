@@ -186,7 +186,6 @@ public class Obfuscate extends javax.swing.JFrame {
 //            }
 //        }
 //    }
-
     public void updatePackageNamesFromTable(JTable table) {
         int columnIndex = 0;  // column index of the package names
         selectedPackageNames.clear();  // Clear existing data in the set
@@ -214,16 +213,22 @@ public class Obfuscate extends javax.swing.JFrame {
         int countOfrows = selectedPackagesTable.getRowCount();
         if (countOfrows < 1) {
             obfuscateButton.setEnabled(false);
+            addPrefixCheckBox.setEnabled(false);
             addSaltCheckBox.setEnabled(false);
-            
+
         } else if (classesCheckBox.isSelected() || methodsCheckBox.isSelected() || fieldVariablesCheckBox.isSelected()) {
             obfuscateButton.setEnabled(true);
+            addPrefixCheckBox.setEnabled(true);
             addSaltCheckBox.setEnabled(true);
+
         } else if (!classesCheckBox.isSelected() && !methodsCheckBox.isSelected() && !fieldVariablesCheckBox.isSelected()) {
             obfuscateButton.setEnabled(false);
+            addPrefixCheckBox.setEnabled(false);
             addSaltCheckBox.setEnabled(false);
+
         } else {
             obfuscateButton.setEnabled(true);
+            addPrefixCheckBox.setEnabled(true);
             addSaltCheckBox.setEnabled(true);
         }
     }
@@ -281,15 +286,33 @@ public class Obfuscate extends javax.swing.JFrame {
             logCollectedNamesForObfuscation(selectedPackageName, classRenameMap, methodRenameMap, fieldVariableRenameMap, decompiledDir);
         }
     }
-    
+
+    public static String generateValidUUID() {
+        String uuidString = UUID.randomUUID().toString().replace("-", "");
+
+        // Ensure the first character of the UUID is not a digit
+        if (Character.isDigit(uuidString.charAt(0))) {
+            // Prepend a random lowercase letter if the first character is a digit
+            char randomLowerCaseLetter = (char) ('a' + new SecureRandom().nextInt(26));
+            uuidString = randomLowerCaseLetter + uuidString;
+        }
+
+        return uuidString;
+    }
+
     public static String generateDynamicSalt() {
-        String ALPHANUMERIC_CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        String ALPHABETIC_CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"; // Only alphabetic characters for the first character
+        String ALPHANUMERIC_CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"; // Alphanumeric for the rest
         int SALT_LENGTH = 8;
         SecureRandom random = new SecureRandom();
         StringBuilder salt = new StringBuilder(SALT_LENGTH);
 
-        // Generate a random alphanumeric string
-        for (int i = 0; i < SALT_LENGTH; i++) {
+        // Ensure the first character is always alphabetic
+        int firstCharIndex = random.nextInt(ALPHABETIC_CHARACTERS.length());
+        salt.append(ALPHABETIC_CHARACTERS.charAt(firstCharIndex));
+
+        // Generate the remaining random alphanumeric string
+        for (int i = 1; i < SALT_LENGTH; i++) {
             int index = random.nextInt(ALPHANUMERIC_CHARACTERS.length());
             salt.append(ALPHANUMERIC_CHARACTERS.charAt(index));
         }
@@ -304,13 +327,22 @@ public class Obfuscate extends javax.swing.JFrame {
                 loadBlacklistedClasses();
             }
             if (!excludedClasses.contains(className)) {
-                if (addSaltCheckBox.isSelected()){
-                    classRenameMap.putIfAbsent(className, "Class" + generateDynamicSalt() + UUID.randomUUID().toString().replace("-", ""));
+                if (addSaltCheckBox.isSelected()) {
+                    if (addPrefixCheckBox.isSelected()) {
+                        classRenameMap.putIfAbsent(className, "Class" + generateDynamicSalt() + generateValidUUID());
+                    } else {
+                        classRenameMap.putIfAbsent(className, generateDynamicSalt() + generateValidUUID());
+                    }
+
+                } else {
+                    if (addPrefixCheckBox.isSelected()) {
+                        classRenameMap.putIfAbsent(className, "Class" + generateValidUUID());
+                    } else {
+                        classRenameMap.putIfAbsent(className, generateValidUUID());
+                    }
+
                 }
-                else{
-                    classRenameMap.putIfAbsent(className, "Class" + UUID.randomUUID().toString().replace("-", "")); 
-                }
-                
+
             }
         }
         if (methodsCheckBox.isSelected()) {
@@ -321,13 +353,21 @@ public class Obfuscate extends javax.swing.JFrame {
                     loadBlacklistedMethods();
                 }
                 if (!excludedMethods.contains(methodName)) {
-                    if (addSaltCheckBox.isSelected()){
-                        methodRenameMap.putIfAbsent(methodName, "Method" + generateDynamicSalt() + UUID.randomUUID().toString().replace("-", ""));
+                    if (addSaltCheckBox.isSelected()) {
+                        if (addPrefixCheckBox.isSelected()) {
+                            methodRenameMap.putIfAbsent(methodName, "Method" + generateDynamicSalt() + generateValidUUID());
+                        } else {
+                            methodRenameMap.putIfAbsent(methodName, generateDynamicSalt() + generateValidUUID());
+                        }
+                    } else {
+                        if (addPrefixCheckBox.isSelected()) {
+                            methodRenameMap.putIfAbsent(methodName, "Method" + generateValidUUID());
+                        } else {
+                            methodRenameMap.putIfAbsent(methodName, generateValidUUID());
+                        }
+
                     }
-                    else{
-                        methodRenameMap.putIfAbsent(methodName, "Method" + UUID.randomUUID().toString().replace("-", ""));
-                    }
-                    
+
                 }
             }
         }
@@ -339,13 +379,21 @@ public class Obfuscate extends javax.swing.JFrame {
                     loadBlacklistedFieldVariables();
                 }
                 if (!excludedFields.contains(fieldName)) {
-                    if (addSaltCheckBox.isSelected()){
-                        fieldVariableRenameMap.putIfAbsent(fieldName, "Field" + generateDynamicSalt() + UUID.randomUUID().toString().replace("-", ""));
+                    if (addSaltCheckBox.isSelected()) {
+                        if (addPrefixCheckBox.isSelected()) {
+                            fieldVariableRenameMap.putIfAbsent(fieldName, "Field" + generateDynamicSalt() + generateValidUUID());
+                        } else {
+                            fieldVariableRenameMap.putIfAbsent(fieldName, generateDynamicSalt() + generateValidUUID());
+                        }
+                    } else {
+                        if (addPrefixCheckBox.isSelected()) {
+                            fieldVariableRenameMap.putIfAbsent(fieldName, "Field" + generateValidUUID());
+                        } else {
+                            fieldVariableRenameMap.putIfAbsent(fieldName, generateValidUUID());
+                        }
+
                     }
-                    else{
-                        fieldVariableRenameMap.putIfAbsent(fieldName, "Field" + UUID.randomUUID().toString().replace("-", ""));
-                    }
-                    
+
                 }
             }
         }
@@ -460,7 +508,7 @@ public class Obfuscate extends javax.swing.JFrame {
     private void refactorNames() {
         SwingWorker<Void, String> worker = new SwingWorker<Void, String>() {
             @Override
-            protected Void doInBackground() throws Exception {               
+            protected Void doInBackground() throws Exception {
                 Path decompiledDir = Paths.get(Main.decompiledApkPath);
 
                 // Refactor within targeted packages
@@ -679,8 +727,6 @@ public class Obfuscate extends javax.swing.JFrame {
         blackListFieldVariables = new javax.swing.JCheckBox();
         blackListMethodsCheckBox = new javax.swing.JCheckBox();
         blackListClassesCheckBox = new javax.swing.JCheckBox();
-        consoleScrollPane = new javax.swing.JScrollPane();
-        consoleArea = new javax.swing.JTextArea();
         linkedInButton = new javax.swing.JButton();
         backButton = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
@@ -689,6 +735,9 @@ public class Obfuscate extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
         addSaltCheckBox = new javax.swing.JCheckBox();
+        addPrefixCheckBox = new javax.swing.JCheckBox();
+        consoleScrollPane = new javax.swing.JScrollPane();
+        consoleArea = new javax.swing.JTextArea();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setResizable(false);
@@ -1109,17 +1158,6 @@ public class Obfuscate extends javax.swing.JFrame {
         obfuscatePanel.add(blackListCBPanel);
         blackListCBPanel.setBounds(470, 460, 410, 50);
 
-        consoleArea.setEditable(false);
-        consoleArea.setBackground(new java.awt.Color(0, 0, 0));
-        consoleArea.setColumns(20);
-        consoleArea.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
-        consoleArea.setForeground(new java.awt.Color(255, 255, 255));
-        consoleArea.setRows(5);
-        consoleScrollPane.setViewportView(consoleArea);
-
-        obfuscatePanel.add(consoleScrollPane);
-        consoleScrollPane.setBounds(390, 390, 520, 160);
-
         linkedInButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/obfuscateme/img/linkedin.png"))); // NOI18N
         linkedInButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         linkedInButton.setFocusable(false);
@@ -1170,7 +1208,24 @@ public class Obfuscate extends javax.swing.JFrame {
         addSaltCheckBox.setEnabled(false);
         addSaltCheckBox.setFocusable(false);
         obfuscatePanel.add(addSaltCheckBox);
-        addSaltCheckBox.setBounds(610, 520, 110, 20);
+        addSaltCheckBox.setBounds(680, 520, 110, 20);
+
+        addPrefixCheckBox.setText("Prefix?");
+        addPrefixCheckBox.setEnabled(false);
+        addPrefixCheckBox.setFocusable(false);
+        obfuscatePanel.add(addPrefixCheckBox);
+        addPrefixCheckBox.setBounds(550, 520, 110, 20);
+
+        consoleArea.setEditable(false);
+        consoleArea.setBackground(new java.awt.Color(0, 0, 0));
+        consoleArea.setColumns(20);
+        consoleArea.setFont(new java.awt.Font("Segoe UI", 0, 11)); // NOI18N
+        consoleArea.setForeground(new java.awt.Color(255, 255, 255));
+        consoleArea.setRows(5);
+        consoleScrollPane.setViewportView(consoleArea);
+
+        obfuscatePanel.add(consoleScrollPane);
+        consoleScrollPane.setBounds(390, 390, 520, 160);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -1433,7 +1488,7 @@ public class Obfuscate extends javax.swing.JFrame {
         }
         //</editor-fold>
         //</editor-fold>
-        
+
         //</editor-fold>
         //</editor-fold>
 
@@ -1445,6 +1500,7 @@ public class Obfuscate extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addPackageButton;
+    private javax.swing.JCheckBox addPrefixCheckBox;
     private javax.swing.JCheckBox addSaltCheckBox;
     private javax.swing.JLabel apkFileNameLabel;
     private javax.swing.JTable availablePackagesTable;
