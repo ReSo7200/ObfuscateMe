@@ -5,6 +5,7 @@
 package obfuscateme;
 
 import java.awt.Desktop;
+import java.awt.HeadlessException;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -269,6 +270,42 @@ public class Recompile extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_signCheckBoxActionPerformed
 
+    private void deleteDirectoryInBackground(File outputDirFile) {
+        loadingLabel.setVisible(true);
+        consoleArea.append("Trying to delete directory: " + outputDirFile.getAbsolutePath() + " \n");
+        consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
+
+        // Create a SwingWorker to handle the directory deletion in the background
+        SwingWorker<Boolean, Void> worker = new SwingWorker<>() {
+            @Override
+            protected Boolean doInBackground() {
+                // Perform the directory deletion
+                return Main.deleteDirectory(outputDirFile);
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    loadingLabel.setVisible(false);
+                    boolean deleted = get();
+                    if (!deleted) {
+                        JOptionPane.showMessageDialog(null, "Failed to delete existing directory.", "Error", JOptionPane.ERROR_MESSAGE);
+                        consoleArea.append("Failed to delete existing directory.\n");
+                    } else {
+                        consoleArea.append("Removed decompiled directory.\n");
+                        consoleArea.append("Recompilation completed successfully! You may now close the tool or return to the main menu.\n");
+                    }
+                    consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
+                } catch (HeadlessException | InterruptedException | ExecutionException e) {
+                    consoleArea.append("Error during directory deletion: " + e.getMessage() + "\n");
+                    consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
+                }
+            }
+        };
+
+        worker.execute(); // Execute the background task
+    }
+
     private void executeApktool() {
         JFileChooser fileChooser = new JFileChooser(System.getProperty("user.dir"));
         fileChooser.setAcceptAllFileFilterUsed(false);
@@ -281,7 +318,8 @@ public class Recompile extends javax.swing.JFrame {
         }
         fileChooser.setSelectedFile(new File(originalFileName + "_obfuscated.apk")); // Suggest a file name
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-
+        // Set the default directory to the APK's directory
+        fileChooser.setCurrentDirectory(Main.apkDirectory);
         // Show save dialog; this method does not return until the dialog is closed
         int userSelection = fileChooser.showSaveDialog(null);
 
@@ -410,15 +448,7 @@ public class Recompile extends javax.swing.JFrame {
                             );
                             if (response1 == JOptionPane.YES_OPTION) {
                                 // If yes, delete the directory
-                                boolean deleted = Main.deleteDirectory(Main.outputDirFile);
-                                if (!deleted) {
-                                    JOptionPane.showMessageDialog(null, "Failed to delete existing directory.", "Error", JOptionPane.ERROR_MESSAGE);
-                                    consoleArea.append("Failed to delete existing directory.\n");
-                                } else {
-                                    consoleArea.append("Removed decompiled directiry.\n");
-                                    consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
-                                }
-
+                                 deleteDirectoryInBackground(Main.outputDirFile);
                             }
                         }
 
@@ -561,13 +591,7 @@ public class Recompile extends javax.swing.JFrame {
                         );
 
                         if (response1 == JOptionPane.YES_OPTION) {
-                            boolean deleted = Main.deleteDirectory(Main.outputDirFile);
-                            if (!deleted) {
-                                JOptionPane.showMessageDialog(null, "Failed to delete existing directory.", "Error", JOptionPane.ERROR_MESSAGE);
-                                consoleArea.append("Failed to delete existing directory.\n");
-                            } else {
-                                consoleArea.append("Removed decompiled directory.\nFeel free to close the tool or get back to the main menu.\n");
-                            }
+                            deleteDirectoryInBackground(Main.outputDirFile);
                         } else {
                             consoleArea.append("Feel free to close the tool or get back to the main menu.\n");
                         }

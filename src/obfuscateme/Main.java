@@ -5,6 +5,7 @@
 package obfuscateme;
 
 import java.awt.Desktop;
+import java.awt.HeadlessException;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -193,6 +194,16 @@ public class Main extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void enableLoading() {
+        selectAPKFileButton.setVisible(false);
+        decompileButton.setVisible(false);
+        consoleScrollPane.setVisible(true);
+        loadingLabel.setVisible(true);
+        selectedAPKFileLabel.setBounds(220, 220, 350, 30);
+        apkFileNameLabel.setBounds(390, 220, 350, 30);
+        mainPanel.repaint();
+    }
+
     private void selectAPKFileButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectAPKFileButtonActionPerformed
         // TODO add your handling code here:
         // JFileChooser configured to select only APK files
@@ -219,7 +230,6 @@ public class Main extends javax.swing.JFrame {
     }//GEN-LAST:event_selectAPKFileButtonActionPerformed
 
     private void decompileButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_decompileButtonActionPerformed
-        // TODO add your handling code here:
         // Ensure an APK file has been selected
         if (selectedApkPath == null) {
             JOptionPane.showMessageDialog(this, "Please select an APK file first.", "No File Selected", JOptionPane.ERROR_MESSAGE);
@@ -228,7 +238,15 @@ public class Main extends javax.swing.JFrame {
 
         String apkFileName = selectedApkPath.getFileName().toString();
         String apkBaseName = apkFileName.replaceFirst("[.][^.]+$", ""); // Remove the file extension
-        JFileChooser fileChooser = new JFileChooser(System.getProperty("user.dir"));
+
+        // Get the directory where the APK file is located
+        apkDirectory = selectedApkPath.getParent().toFile();
+
+        // Create the JFileChooser
+        JFileChooser fileChooser = new JFileChooser();
+
+        // Set the default directory to the APK's directory
+        fileChooser.setCurrentDirectory(apkDirectory);
 
         // Set it to directory selection mode (instead of file selection)
         fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -247,39 +265,51 @@ public class Main extends javax.swing.JFrame {
                 outputDirFile = outputDirectory.toFile(); // Convert Path to File
 
                 if (outputDirFile.exists()) {
-                    // Ask the user if they want to delete the existing directory
-                    int response = JOptionPane.showConfirmDialog(
+                    // Custom dialog with three options
+                    String[] options = {"Yes, Delete", "No, Cancel", "Auto Set Dir"};
+                    int response = JOptionPane.showOptionDialog(
                             this,
-                            "The output directory already exists. Do you want to delete it and continue?",
+                            "The output directory already exists. Do you want to delete it, cancel, or auto set a new directory?",
                             "Confirm Overwrite",
-                            JOptionPane.YES_NO_OPTION,
-                            JOptionPane.WARNING_MESSAGE
+                            JOptionPane.DEFAULT_OPTION,
+                            JOptionPane.WARNING_MESSAGE,
+                            null,
+                            options,
+                            options[0]
                     );
-                    if (response == JOptionPane.YES_OPTION) {
-                        // If yes, delete the directory
-                        boolean deleted = deleteDirectory(outputDirFile);
-                        if (!deleted) {
-                            JOptionPane.showMessageDialog(this, "Failed to delete existing directory.", "Error", JOptionPane.ERROR_MESSAGE);
-                            return;
+                    switch (response) {
+                        case 0 -> // Yes, delete the directory
+                            deleteDirectoryInBackground(outputDirFile, apkFileName);
+                        case 1 -> {
+                            // No, cancel the operation
                         }
-                    } else {
-                        // User chose not to overwrite, find a new unique directory name
-                        outputDirectory = findUniqueDirectory(outputDirectory);
+                        case 2 -> {
+                            // Auto set directory
+                            enableLoading();
+                            outputDirectory = findUniqueDirectory(outputDirectory);
+                            consoleArea.append("Selected directory already exists!\nWill be using directory: " + outputDirectory + " \n");
+                            consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
+                            executeApktool(apkFileName);
+                        }
+                        default -> {
+                            // Handle unexpected cases
+                            consoleArea.append("Unexpected option selected.\n");
+                            consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
+                        }
                     }
+                } else {
+                    // If directory doesn't exist, proceed to APK tool execution
+                    enableLoading();
+                    executeApktool(apkFileName);
                 }
-                // Proceed to APK tool execution
-                executeApktool(apkFileName);
             }
 
             case JFileChooser.CANCEL_OPTION -> {
                 // User canceled the operation
-                 consoleArea.append("File selection was canceled by the user.");
-                 consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
                 return; // Stop further execution if the user cancels
             }
-            default -> {// If there's some other unexpected result
-                consoleArea.append("An unexpected error occurred.");
-                consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
+            default -> {
+                // If there's some other unexpected result
             }
         }
     }//GEN-LAST:event_decompileButtonActionPerformed
@@ -304,6 +334,46 @@ public class Main extends javax.swing.JFrame {
         return directoryToBeDeleted.delete();
     }
 
+    // Background task to delete directory
+    private void deleteDirectoryInBackground(File outputDirFile, String apkFileName) {
+        enableLoading();
+        consoleArea.append("Trying to delete directory:" + outputDirectory + " \n");
+        consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
+
+        // Create a SwingWorker to handle the directory deletion in the background
+        SwingWorker<Boolean, Void> worker = new SwingWorker<>() {
+            @Override
+            protected Boolean doInBackground() {
+                // Perform the directory deletion
+                return deleteDirectory(outputDirFile);
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    boolean deleted = get();
+                    if (!deleted) {
+                        JOptionPane.showMessageDialog(null, "Failed to delete existing directory.", "Error", JOptionPane.ERROR_MESSAGE);
+                        consoleArea.append("Couldn't delete directory:" + outputDirectory + " \n");
+                        consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
+                        outputDirectory = findUniqueDirectory(outputDirectory);
+                        consoleArea.append("Will be using directory:" + outputDirectory + " \n");
+                    } else {
+                        consoleArea.append("Deleted directory:" + outputDirectory + " \n");
+                    }
+                    consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
+                } catch (HeadlessException | InterruptedException | ExecutionException e) {
+                    consoleArea.append("Error during directory deletion: " + e.getMessage() + "\n");
+                    consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
+                } finally {
+                    executeApktool(apkFileName); // Proceed to execute APK tool after directory deletion
+                }
+            }
+        };
+
+        worker.execute(); // Execute the background task
+    }
+
     private Path findUniqueDirectory(Path baseOutputDirectory) {
         int counter = 1;
         Path uniqueDir = baseOutputDirectory;
@@ -316,13 +386,6 @@ public class Main extends javax.swing.JFrame {
     }
 
     private void executeApktool(String apkFileName) {
-        selectAPKFileButton.setVisible(false);
-        decompileButton.setVisible(false);
-        loadingLabel.setVisible(true);
-        consoleScrollPane.setVisible(true);
-        selectedAPKFileLabel.setBounds(220, 220, 350, 30);
-        apkFileNameLabel.setBounds(390, 220, 350, 30);
-        mainPanel.repaint();
         consoleArea.append("Decompiling APK file: " + selectedApkPath + "\n");
         consoleArea.append("Output directory: " + outputDirectory + "\n");
 
@@ -346,7 +409,7 @@ public class Main extends javax.swing.JFrame {
                     while ((line = reader.readLine()) != null) {
                         String cleanLine = "";
                         if (line.startsWith("I:")) {
-                        // Remove the "I:" prefix and any leading whitespace
+                            // Remove the "I:" prefix and any leading whitespace
                             cleanLine = line.substring(line.indexOf("I:") + 2).trim();
                         }
                         consoleArea.append(cleanLine + "\n");
@@ -368,14 +431,14 @@ public class Main extends javax.swing.JFrame {
                         decompiledApkPath = outputDirectory.toAbsolutePath().toString();
                         publicAPKFileName = apkFileName;
                         decompileFolderName = String.valueOf(outputDirectory.getFileName());
-                        
+
                         loadingLabel.setVisible(false);
                         consoleArea.append("Decompilation completed successfully.\n");
                         consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
                         // Show the success message
                         JOptionPane.showMessageDialog(null, "Decompilation completed successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
                         loadingLabel.setVisible(true);
-                        
+
                         // Keep the loading label visible and update the console area
                         consoleArea.append("Analysing decompiled APK... Please wait!\n");
                         consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
@@ -452,7 +515,7 @@ public class Main extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(Main.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
-        
+
         //</editor-fold>
 
         /* Create and display the form */
@@ -485,4 +548,5 @@ public class Main extends javax.swing.JFrame {
     public static String decompileFolderName;
     public static String publicAPKFileName;
     public static ImageIcon icon;
+    public static File apkDirectory;
 }

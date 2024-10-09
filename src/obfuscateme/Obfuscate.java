@@ -30,12 +30,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.RowFilter;
 import javax.swing.SwingWorker;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 
@@ -95,6 +97,18 @@ public class Obfuscate extends javax.swing.JFrame {
             addPackageButton.setEnabled(false);
         }
 
+    }
+
+    private void enableConsole() {
+        obfuscateButton.setVisible(false);
+        obfuscateLabel.setVisible(false);
+        blackListLabel.setVisible(false);
+        noteLabel.setVisible(false);
+        obfuscateCBPanel.setVisible(false);
+        blackListCBPanel.setVisible(false);
+        addPrefixCheckBox.setVisible(false);
+        addSaltCheckBox.setVisible(false);
+        consoleScrollPane.setVisible(true);
     }
 
     private void populatePackagesTable() {
@@ -262,28 +276,70 @@ public class Obfuscate extends javax.swing.JFrame {
         fieldVariableRenameMap.clear();
         methodUsageMap.clear();
 
-        for (String selectedPackageName : selectedPackageNames) {
-            loadingLabel.setVisible(true);
-            Files.walkFileTree(decompiledDir, new SimpleFileVisitor<Path>() {
-                @Override
-                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                    String fileName = file.getFileName().toString();
-                    if (fileName.endsWith(".smali") && !fileName.contains("$") && !fileName.startsWith("R")) {
-                        String content = Files.readString(file);
-                        String filePackagePath = getPackagePath(decompiledDir, file);
+        // Suggested default file name
+        String defaultFileName = Main.publicAPKFileName + "_refactoring_map.txt";
 
-                        if (selectedPackageName.equals(filePackagePath)) {
-                            processFileForObfuscation(content, fileName);
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Select where to save the refactoring map log");
+        fileChooser.setSelectedFile(new File(defaultFileName));  // Set the default file name
+        fileChooser.setCurrentDirectory(decompiledDir.getParent().toFile());
+        FileNameExtensionFilter txtFilter = new FileNameExtensionFilter("Text Files (*.txt)", "txt");
+        fileChooser.setFileFilter(txtFilter);
+
+        int userSelection = fileChooser.showSaveDialog(null);
+
+        if (userSelection == JFileChooser.APPROVE_OPTION) {
+            File fileToSave = fileChooser.getSelectedFile();
+
+            // Ensure the file has a .txt extension if the user didn't provide one
+            if (!fileToSave.getName().endsWith(".txt")) {
+                fileToSave = new File(fileToSave.getAbsolutePath() + ".txt");
+            }
+
+            try (BufferedWriter writer = Files.newBufferedWriter(fileToSave.toPath())) {
+                for (String selectedPackageName : selectedPackageNames) {
+                    loadingLabel.setVisible(true);
+
+                    // Clear maps before processing each package
+                    classRenameMap.clear();
+                    methodRenameMap.clear();
+                    fieldVariableRenameMap.clear();
+
+                    Files.walkFileTree(decompiledDir, new SimpleFileVisitor<Path>() {
+                        @Override
+                        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                            String fileName = file.getFileName().toString();
+                            if (fileName.endsWith(".smali") && !fileName.contains("$") && !fileName.startsWith("R")) {
+                                String content = Files.readString(file);
+                                String filePackagePath = getPackagePath(decompiledDir, file);
+
+                                if (selectedPackageName.equals(filePackagePath)) {
+                                    processFileForObfuscation(content, fileName);
+                                }
+                                // Collect external method usages across all files
+                                findMethodUsages(file, content);
+                            }
+                            return FileVisitResult.CONTINUE;
                         }
-                        // Collect external method usages across all files
-                        findMethodUsages(file, content);
-                    }
-                    return FileVisitResult.CONTINUE;
-                }
-            });
+                    });
 
-            // Optionally, log the collected names for verification
-            logCollectedNamesForObfuscation(selectedPackageName, classRenameMap, methodRenameMap, fieldVariableRenameMap, decompiledDir);
+                    // Log the collected names for each package
+                    logCollectedNamesForObfuscation(selectedPackageName, classRenameMap, methodRenameMap, fieldVariableRenameMap, writer);
+                }
+
+                enableConsole();
+                consoleArea.append("Refactoring map successfully saved to: " + fileToSave.getAbsolutePath() + "\n");
+                consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
+            } catch (IOException e) {
+                enableConsole();
+                consoleArea.append("Error saving the refactoring map: " + e.getMessage());
+                consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
+            }
+        } else {
+            // Optionally, handle the case where the user cancels the file save operation
+            enableConsole();
+            consoleArea.append("User canceled the file save operation.");
+            consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
         }
     }
 
@@ -411,22 +467,25 @@ public class Obfuscate extends javax.swing.JFrame {
         }
     }
 
-    private void logCollectedNamesForObfuscation(String packageName, Map<String, String> classMap, Map<String, String> methodMap, Map<String, String> fieldVariableMap, Path basePath) throws IOException {
-        Path logFilePath = basePath.resolve("../" + packageName.replace('.', '_') + "_for_obfuscation.txt");
-        try (BufferedWriter writer = Files.newBufferedWriter(logFilePath)) {
-            writer.write("Classes to be obfuscated:\n");
-            for (String originalClass : classMap.keySet()) {
-                writer.write(originalClass + " -> " + classMap.get(originalClass) + "\n");
-            }
-            writer.write("\nMethods to be obfuscated:\n");
-            for (String originalMethod : methodMap.keySet()) {
-                writer.write(originalMethod + " -> " + methodMap.get(originalMethod) + "\n");
-            }
-            writer.write("\nField Variables to be obfuscated:\n");
-            for (Map.Entry<String, String> entry : fieldVariableMap.entrySet()) {
-                writer.write(entry.getKey() + " -> " + entry.getValue() + "\n");
-            }
+    private void logCollectedNamesForObfuscation(String packageName, Map<String, String> classMap, Map<String, String> methodMap, Map<String, String> fieldVariableMap, BufferedWriter writer) throws IOException {
+        writer.write("Package: " + packageName + "\n\n");
+
+        writer.write("Classes to be obfuscated:\n");
+        for (String originalClass : classMap.keySet()) {
+            writer.write(originalClass + " -> " + classMap.get(originalClass) + "\n");
         }
+
+        writer.write("\nMethods to be obfuscated:\n");
+        for (String originalMethod : methodMap.keySet()) {
+            writer.write(originalMethod + " -> " + methodMap.get(originalMethod) + "\n");
+        }
+
+        writer.write("\nField Variables to be obfuscated:\n");
+        for (Map.Entry<String, String> entry : fieldVariableMap.entrySet()) {
+            writer.write(entry.getKey() + " -> " + entry.getValue() + "\n");
+        }
+
+        writer.write("\n------------------------------------------------------\n");
     }
 
     public void collectMethodUsages(Path basePath) throws IOException {
@@ -509,6 +568,16 @@ public class Obfuscate extends javax.swing.JFrame {
         SwingWorker<Void, String> worker = new SwingWorker<Void, String>() {
             @Override
             protected Void doInBackground() throws Exception {
+
+//                obfuscateButton.setEnabled(false);
+//                classesCheckBox.setEnabled(false);
+//                methodsCheckBox.setEnabled(false);
+//                fieldVariablesCheckBox.setEnabled(false);
+//                blackListClassesCheckBox.setEnabled(false);
+//                blackListMethodsCheckBox.setEnabled(false);
+//                blackListFieldVariables.setEnabled(false);
+                enableConsole();
+                backButton.setEnabled(false);
                 Path decompiledDir = Paths.get(Main.decompiledApkPath);
 
                 // Refactor within targeted packages
@@ -516,14 +585,6 @@ public class Obfuscate extends javax.swing.JFrame {
                         .filter(Files::isDirectory)
                         .filter(path -> path.getFileName().toString().startsWith("smali"))
                         .forEach(smaliDir -> {
-                            obfuscateButton.setEnabled(false);
-                            classesCheckBox.setEnabled(false);
-                            methodsCheckBox.setEnabled(false);
-                            fieldVariablesCheckBox.setEnabled(false);
-                            blackListClassesCheckBox.setEnabled(false);
-                            blackListMethodsCheckBox.setEnabled(false);
-                            blackListFieldVariables.setEnabled(false);
-                            backButton.setEnabled(false);
                             selectedPackageNames.forEach(selectedPackageName -> {
                                 Path targetDir = smaliDir.resolve(selectedPackageName.replace(".", File.separator));
                                 if (Files.exists(targetDir)) {
@@ -626,7 +687,8 @@ public class Obfuscate extends javax.swing.JFrame {
                 numberOfRefactoedClasses.set(refactoredClassNames.size()); // Reflects unique class count
                 numberOfRefactoredMethods.set(refactoredMethodNames.size()); // Reflects unique method count
                 numberOfRefactoredLFields.set(refactoredFieldVariableNames.size()); // Reflects unique Local fields count
-
+                loadingLabel.setVisible(false);
+                enableConsole();
                 consoleArea.append("Refactoring complete.");
                 consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
 
@@ -642,6 +704,12 @@ public class Obfuscate extends javax.swing.JFrame {
                     new Recompile().setVisible(true);
                 } else {
                     // If the user chooses "No", ask if they want to open the decompilation folder
+                    backButton.setEnabled(true);
+                    availablePackagesTable.setEnabled(false);
+                    selectedPackagesTable.setEnabled(false);
+                    addPackageButton.setEnabled(false);
+                    removePackageButton.setEnabled(false);
+                    
                     int openFolderResponse = JOptionPane.showConfirmDialog(null,
                             "Would you like to open the decompilation folder?",
                             "Open Folder",
@@ -656,8 +724,7 @@ public class Obfuscate extends javax.swing.JFrame {
                             JOptionPane.showMessageDialog(null, "An error occurred while trying to open the folder.");
                         }
                     }
-                    dispose();
-                    new Main().setVisible(true);
+                    
                 }
 
             }
@@ -1247,14 +1314,6 @@ public class Obfuscate extends javax.swing.JFrame {
             // Get the selected packages from the table
             updatePackageNamesFromTable(selectedPackagesTable);
 
-            obfuscateButton.setVisible(false);
-            obfuscateLabel.setVisible(false);
-            blackListLabel.setVisible(false);
-            noteLabel.setVisible(false);
-            obfuscateCBPanel.setVisible(false);
-            addSaltCheckBox.setVisible(false);
-            consoleScrollPane.setVisible(true);
-
             // Collect class and method names wihtin the specified package
             collectNames();
 
@@ -1331,8 +1390,6 @@ public class Obfuscate extends javax.swing.JFrame {
             } catch (IOException e) {
                 JOptionPane.showMessageDialog(this, "Error writing to file: " + outputPath, "Error", JOptionPane.ERROR_MESSAGE);
             }
-
-            //JOptionPane.showMessageDialog(this, "Class and method list written to: " + outputPath, "Operation Complete", JOptionPane.INFORMATION_MESSAGE);
         }
     }//GEN-LAST:event_availablePackagesTableMousePressed
 
