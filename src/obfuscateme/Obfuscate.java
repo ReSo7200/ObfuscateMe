@@ -456,13 +456,30 @@ public class Obfuscate extends javax.swing.JFrame {
     }
 
     private void findMethodUsages(Path file, String content) {
-        // Pattern to find method invocations
-        Matcher methodMatcher = Pattern.compile("invoke\\s+.+\\s+(L[^;]+;)->(\\w+)\\(").matcher(content);
+        // Pattern to find method invocations, including static, virtual, direct, super, and interface methods
+        Matcher methodMatcher = Pattern.compile(
+                "invoke-(static|virtual|direct|super|interface)\\s+\\{[^}]*},\\s+L([^;]+);->(\\w+)\\(.*?\\)" // Match different invoke types
+        ).matcher(content);
+
         while (methodMatcher.find()) {
-            String className = methodMatcher.group(1).replace('/', '.').substring(1, methodMatcher.group(1).length() - 1); // Format class name
-            String methodName = methodMatcher.group(2);
+            String className = methodMatcher.group(2).replace('/', '.');  // Format class name
+            String methodName = methodMatcher.group(3);  // Capture method name
             String key = className + "." + methodName;
 
+            // Store method usage in map, associating the class and method with the file path
+            methodUsageMap.computeIfAbsent(key, k -> new HashSet<>()).add(file.toString());
+        }
+
+        // Additionally, capture reflection-based method invocations (e.g., Class.getMethod("methodName"))
+        Matcher reflectionMatcher = Pattern.compile(
+                "const-string\\s+\\w+,\\s+\"(\\w+)\"\\s+invoke-virtual\\s+\\{[^}]*},\\s+Ljava/lang/Class;->getMethod"
+        ).matcher(content);
+
+        while (reflectionMatcher.find()) {
+            String methodName = reflectionMatcher.group(1);  // Capture method name in reflection call
+            String key = "reflection." + methodName;  // Use a special key for reflection calls
+
+            // Store method usage for reflection-based method invocations
             methodUsageMap.computeIfAbsent(key, k -> new HashSet<>()).add(file.toString());
         }
     }
@@ -709,7 +726,7 @@ public class Obfuscate extends javax.swing.JFrame {
                     selectedPackagesTable.setEnabled(false);
                     addPackageButton.setEnabled(false);
                     removePackageButton.setEnabled(false);
-                    
+
                     int openFolderResponse = JOptionPane.showConfirmDialog(null,
                             "Would you like to open the decompilation folder?",
                             "Open Folder",
@@ -724,7 +741,7 @@ public class Obfuscate extends javax.swing.JFrame {
                             JOptionPane.showMessageDialog(null, "An error occurred while trying to open the folder.");
                         }
                     }
-                    
+
                 }
 
             }
@@ -1194,6 +1211,11 @@ public class Obfuscate extends javax.swing.JFrame {
         blackListClassesCheckBox.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         blackListClassesCheckBox.setEnabled(false);
         blackListClassesCheckBox.setFocusable(false);
+        blackListClassesCheckBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                blackListClassesCheckBoxActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout blackListCBPanelLayout = new javax.swing.GroupLayout(blackListCBPanel);
         blackListCBPanel.setLayout(blackListCBPanelLayout);
@@ -1298,11 +1320,14 @@ public class Obfuscate extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(obfuscatePanel, javax.swing.GroupLayout.PREFERRED_SIZE, 1280, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(obfuscatePanel, javax.swing.GroupLayout.PREFERRED_SIZE, 1280, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(obfuscatePanel, javax.swing.GroupLayout.PREFERRED_SIZE, 685, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(obfuscatePanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 685, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
 
         pack();
@@ -1523,6 +1548,11 @@ public class Obfuscate extends javax.swing.JFrame {
         dispose();
         new Main().setVisible(true);
     }//GEN-LAST:event_backButtonActionPerformed
+
+    private void blackListClassesCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_blackListClassesCheckBoxActionPerformed
+        // TODO add your handling code here:
+
+    }//GEN-LAST:event_blackListClassesCheckBoxActionPerformed
 
     /**
      * @param args the command line arguments
