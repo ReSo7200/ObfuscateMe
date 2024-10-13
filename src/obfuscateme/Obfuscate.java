@@ -5,10 +5,8 @@
 package obfuscateme;
 
 import java.awt.Desktop;
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -102,12 +100,11 @@ public class Obfuscate extends javax.swing.JFrame {
     private void enableConsole() {
         obfuscateButton.setVisible(false);
         obfuscateLabel.setVisible(false);
-        blackListLabel.setVisible(false);
         noteLabel.setVisible(false);
         obfuscateCBPanel.setVisible(false);
-        blackListCBPanel.setVisible(false);
         addPrefixCheckBox.setVisible(false);
         addSaltCheckBox.setVisible(false);
+        blackListButton.setVisible(false);
         consoleScrollPane.setVisible(true);
     }
 
@@ -248,22 +245,10 @@ public class Obfuscate extends javax.swing.JFrame {
     }
 
     private void checkEnableBlackListButtons() {
-        if (classesCheckBox.isSelected()) {
-            blackListClassesCheckBox.setEnabled(true);
+        if ((classesCheckBox.isSelected() || methodsCheckBox.isSelected() || fieldVariablesCheckBox.isSelected())) {
+            blackListButton.setEnabled(true);
         } else {
-            blackListClassesCheckBox.setEnabled(false);
-        }
-
-        if (methodsCheckBox.isSelected()) {
-            blackListMethodsCheckBox.setEnabled(true);
-        } else {
-            blackListMethodsCheckBox.setEnabled(false);
-        }
-
-        if (fieldVariablesCheckBox.isSelected()) {
-            blackListFieldVariables.setEnabled(true);
-        } else {
-            blackListFieldVariables.setEnabled(false);
+            blackListButton.setEnabled(false);
         }
     }
 
@@ -314,7 +299,8 @@ public class Obfuscate extends javax.swing.JFrame {
                                 String filePackagePath = getPackagePath(decompiledDir, file);
 
                                 if (selectedPackageName.equals(filePackagePath)) {
-                                    processFileForObfuscation(content, fileName);
+                                    System.out.println(loadBlacklistedItems());
+                                    processFileForObfuscation(content, fileName, filePackagePath);
                                 }
                                 // Collect external method usages across all files
                                 findMethodUsages(file, content);
@@ -376,39 +362,41 @@ public class Obfuscate extends javax.swing.JFrame {
         return salt.toString(); // Return the alphanumeric salt
     }
 
-    private void processFileForObfuscation(String content, String fileName) {
+    private void processFileForObfuscation(String content, String fileName, String packageName) {
+        // Extract the class name from the file
+        String className = fileName.replace(".smali", "");
+        String fullClassName = packageName + "." + className;
+
         if (classesCheckBox.isSelected()) {
-            String className = fileName.replace(".smali", "");
-            if (blackListClassesCheckBox.isSelected()) {
-                loadBlacklistedClasses();
-            }
-            if (!excludedClasses.contains(className)) {
+//            // Check if the class itself is blacklisted
+//            System.out.println("Checking Class: " + fullClassName);
+//            System.out.println("Blacklist contains: " + loadBlacklistedItems().contains(fullClassName));
+            if (!((loadBlacklistedItems().contains(fullClassName)) || (excludedClasses.contains(className)))){
                 if (addSaltCheckBox.isSelected()) {
                     if (addPrefixCheckBox.isSelected()) {
                         classRenameMap.putIfAbsent(className, "Class" + generateDynamicSalt() + generateValidUUID());
                     } else {
                         classRenameMap.putIfAbsent(className, generateDynamicSalt() + generateValidUUID());
                     }
-
                 } else {
                     if (addPrefixCheckBox.isSelected()) {
                         classRenameMap.putIfAbsent(className, "Class" + generateValidUUID());
                     } else {
                         classRenameMap.putIfAbsent(className, generateValidUUID());
                     }
-
                 }
-
             }
         }
+
         if (methodsCheckBox.isSelected()) {
             Matcher methodMatcher = Pattern.compile("\\.method .+ (\\w+)\\(").matcher(content);
             while (methodMatcher.find()) {
                 String methodName = methodMatcher.group(1);
-                if (blackListMethodsCheckBox.isSelected()) {
-                    loadBlacklistedMethods();
-                }
-                if (!excludedMethods.contains(methodName)) {
+                String fullMethodName = fullClassName + "." + methodName;
+                System.out.println(fullMethodName);
+
+                // Check if the method is blacklisted within this specific class and package
+                if (!((loadBlacklistedItems().contains(fullMethodName)) || (excludedMethods.contains(methodName)))) {
                     if (addSaltCheckBox.isSelected()) {
                         if (addPrefixCheckBox.isSelected()) {
                             methodRenameMap.putIfAbsent(methodName, "Method" + generateDynamicSalt() + generateValidUUID());
@@ -421,20 +409,19 @@ public class Obfuscate extends javax.swing.JFrame {
                         } else {
                             methodRenameMap.putIfAbsent(methodName, generateValidUUID());
                         }
-
                     }
-
                 }
             }
         }
+
         if (fieldVariablesCheckBox.isSelected()) {
             Matcher fieldMatcher = Pattern.compile("\\.field\\s+(public|private|protected|static|final|\\s)+\\s*(\\w+)\\s*:\\s*(L[^;]+;|\\[L[^;]+;|I|Z|B|S|J|F|D|C)").matcher(content);
             while (fieldMatcher.find()) {
                 String fieldName = fieldMatcher.group(2);
-                if (blackListFieldVariables.isSelected()) {
-                    loadBlacklistedFieldVariables();
-                }
-                if (!excludedFields.contains(fieldName)) {
+                String fullFieldName = fullClassName + "." + fieldName;
+
+                // Check if the field is blacklisted within this specific class and package
+                if (!loadBlacklistedItems().contains(fullFieldName)) {
                     if (addSaltCheckBox.isSelected()) {
                         if (addPrefixCheckBox.isSelected()) {
                             fieldVariableRenameMap.putIfAbsent(fieldName, "Field" + generateDynamicSalt() + generateValidUUID());
@@ -447,9 +434,7 @@ public class Obfuscate extends javax.swing.JFrame {
                         } else {
                             fieldVariableRenameMap.putIfAbsent(fieldName, generateValidUUID());
                         }
-
                     }
-
                 }
             }
         }
@@ -548,36 +533,8 @@ public class Obfuscate extends javax.swing.JFrame {
     // Add any other classes specific to your application that should not be obfuscated
     ));
 
-    Set<String> excludedFields = new HashSet<>(Arrays.asList(""));
-
-    private void loadBlacklistedClasses() {
-        try (BufferedReader reader = new BufferedReader(new FileReader("src/obfuscateme/blacklistedClasses.txt"))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                excludedClasses.add(line.trim());
-            }
-        } catch (IOException e) {
-        }
-    }
-
-    private void loadBlacklistedMethods() {
-        try (BufferedReader reader = new BufferedReader(new FileReader("src/obfuscateme/blacklistedMethods.txt"))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                excludedMethods.add(line.trim());
-            }
-        } catch (IOException e) {
-        }
-    }
-
-    private void loadBlacklistedFieldVariables() {
-        try (BufferedReader reader = new BufferedReader(new FileReader("src/obfuscateme/blacklistedFieldVariables.txt"))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                excludedMethods.add(line.trim());
-            }
-        } catch (IOException e) {
-        }
+    private Set<String> loadBlacklistedItems() {
+        return Obfuscate.blacklistedItems;  // Return the blacklisted items from Obfuscate
     }
 
     // Refactor names based on the collected names
@@ -790,7 +747,6 @@ public class Obfuscate extends javax.swing.JFrame {
         loadingLabel = new javax.swing.JLabel();
         decompileFolderLabel = new javax.swing.JLabel();
         decompileFolderNameLabel = new javax.swing.JLabel();
-        blackListLabel = new javax.swing.JLabel();
         searchLabel = new javax.swing.JLabel();
         noteLabel = new javax.swing.JLabel();
         obfuscateLabel = new javax.swing.JLabel();
@@ -806,13 +762,9 @@ public class Obfuscate extends javax.swing.JFrame {
         classesCheckBox = new javax.swing.JCheckBox();
         fieldVariablesCheckBox = new javax.swing.JCheckBox();
         localVariablesCheckBox = new javax.swing.JCheckBox();
-        blackListCBPanel = new javax.swing.JPanel();
-        blackListLocalVariables = new javax.swing.JCheckBox();
-        blackListFieldVariables = new javax.swing.JCheckBox();
-        blackListMethodsCheckBox = new javax.swing.JCheckBox();
-        blackListClassesCheckBox = new javax.swing.JCheckBox();
         linkedInButton = new javax.swing.JButton();
         backButton = new javax.swing.JButton();
+        blackListButton = new javax.swing.JButton();
         hint1Label = new javax.swing.JLabel();
         infoLabel = new javax.swing.JLabel();
         info2Label = new javax.swing.JLabel();
@@ -969,11 +921,6 @@ public class Obfuscate extends javax.swing.JFrame {
         obfuscatePanel.add(decompileFolderNameLabel);
         decompileFolderNameLabel.setBounds(650, 110, 310, 25);
 
-        blackListLabel.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        blackListLabel.setText("Blacklist?*");
-        obfuscatePanel.add(blackListLabel);
-        blackListLabel.setBounds(360, 460, 80, 50);
-
         searchLabel.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         searchLabel.setText("Search:");
         obfuscatePanel.add(searchLabel);
@@ -985,9 +932,9 @@ public class Obfuscate extends javax.swing.JFrame {
         noteLabel.setBounds(570, 550, 200, 20);
 
         obfuscateLabel.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        obfuscateLabel.setText("Obfuscate");
+        obfuscateLabel.setText("Obfuscate:");
         obfuscatePanel.add(obfuscateLabel);
-        obfuscateLabel.setBounds(360, 400, 90, 50);
+        obfuscateLabel.setBounds(360, 400, 100, 50);
 
         jScrollPane2.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         jScrollPane2.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
@@ -1182,71 +1129,6 @@ public class Obfuscate extends javax.swing.JFrame {
         obfuscatePanel.add(obfuscateCBPanel);
         obfuscateCBPanel.setBounds(470, 400, 410, 50);
 
-        blackListCBPanel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 3));
-
-        blackListLocalVariables.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        blackListLocalVariables.setText("Local Variables");
-        blackListLocalVariables.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        blackListLocalVariables.setEnabled(false);
-
-        blackListFieldVariables.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        blackListFieldVariables.setText("Field Variables");
-        blackListFieldVariables.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        blackListFieldVariables.setEnabled(false);
-        blackListFieldVariables.setFocusable(false);
-
-        blackListMethodsCheckBox.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        blackListMethodsCheckBox.setText("Methods");
-        blackListMethodsCheckBox.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        blackListMethodsCheckBox.setEnabled(false);
-        blackListMethodsCheckBox.setFocusable(false);
-        blackListMethodsCheckBox.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                blackListMethodsCheckBoxActionPerformed(evt);
-            }
-        });
-
-        blackListClassesCheckBox.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        blackListClassesCheckBox.setText("Classes");
-        blackListClassesCheckBox.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        blackListClassesCheckBox.setEnabled(false);
-        blackListClassesCheckBox.setFocusable(false);
-        blackListClassesCheckBox.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                blackListClassesCheckBoxActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout blackListCBPanelLayout = new javax.swing.GroupLayout(blackListCBPanel);
-        blackListCBPanel.setLayout(blackListCBPanelLayout);
-        blackListCBPanelLayout.setHorizontalGroup(
-            blackListCBPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, blackListCBPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(blackListClassesCheckBox, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(blackListMethodsCheckBox)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(blackListFieldVariables, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(blackListLocalVariables, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        blackListCBPanelLayout.setVerticalGroup(
-            blackListCBPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(blackListCBPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(blackListCBPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(blackListClassesCheckBox)
-                    .addComponent(blackListFieldVariables)
-                    .addComponent(blackListLocalVariables)
-                    .addComponent(blackListMethodsCheckBox))
-                .addContainerGap(14, Short.MAX_VALUE))
-        );
-
-        obfuscatePanel.add(blackListCBPanel);
-        blackListCBPanel.setBounds(470, 460, 410, 50);
-
         linkedInButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/obfuscateme/img/linkedin.png"))); // NOI18N
         linkedInButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         linkedInButton.setFocusable(false);
@@ -1267,6 +1149,15 @@ public class Obfuscate extends javax.swing.JFrame {
         });
         obfuscatePanel.add(backButton);
         backButton.setBounds(1110, 610, 150, 60);
+
+        blackListButton.setText("Manage White/Black list");
+        blackListButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                blackListButtonActionPerformed(evt);
+            }
+        });
+        obfuscatePanel.add(blackListButton);
+        blackListButton.setBounds(560, 460, 180, 40);
 
         hint1Label.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         hint1Label.setText("Select the packages to be obfusacted");
@@ -1521,10 +1412,6 @@ public class Obfuscate extends javax.swing.JFrame {
         checkEnableBlackListButtons();
     }//GEN-LAST:event_fieldVariablesCheckBoxActionPerformed
 
-    private void blackListMethodsCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_blackListMethodsCheckBoxActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_blackListMethodsCheckBoxActionPerformed
-
     private void linkedInButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_linkedInButtonActionPerformed
         // TODO add your handling code here:
         Main.openWebpage("https://www.linkedin.com/in/abdalhaleem-altamimi-074b5123a/");
@@ -1549,10 +1436,157 @@ public class Obfuscate extends javax.swing.JFrame {
         new Main().setVisible(true);
     }//GEN-LAST:event_backButtonActionPerformed
 
-    private void blackListClassesCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_blackListClassesCheckBoxActionPerformed
-        // TODO add your handling code here:
+    // Helper method to get selected packages from the table
+    private List<String> getSelectedPackagesFromTable() {
+        List<String> selectedPackages = new ArrayList<>();
 
-    }//GEN-LAST:event_blackListClassesCheckBoxActionPerformed
+        // Get the total row count
+        int rowCount = selectedPackagesTable.getRowCount();
+
+        // Iterate through all rows in the table (not just selected ones)
+        for (int row = 0; row < rowCount; row++) {
+            // Convert the view row index to the model row index (in case the table is sorted)
+            int modelRow = selectedPackagesTable.convertRowIndexToModel(row);
+
+            // Get the package name from the first column (index 0)
+            String packageName = (String) selectedPackagesTable.getModel().getValueAt(modelRow, 0);
+
+            // Add the package name to the list
+            selectedPackages.add(packageName);
+        }
+
+        return selectedPackages;
+    }
+
+
+    private void blackListButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_blackListButtonActionPerformed
+        // TODO add your handling code here:
+        List<String> selectedPackages = getSelectedPackagesFromTable();  // A method to get selected packages
+        if (!selectedPackages.isEmpty()) {
+            // Pass the selected packages to the JTree view
+            test treeView = new test(selectedPackages);  // Modify 'test' to accept multiple packages
+            treeView.setVisible(true);  // Show the JTree window
+        } else {
+            JOptionPane.showMessageDialog(this, "Please select at least one package to view.");
+        }
+    }//GEN-LAST:event_blackListButtonActionPerformed
+
+    public static Set<String> getClassesForPackage(String packageName) {
+        Set<String> classNames = new HashSet<>();
+
+        // Define the base directory where the decompiled APK is stored
+        Path decompiledDir = Paths.get(Main.decompiledApkPath);
+        String packageDirectory = packageName.replace('.', File.separatorChar);
+
+        try (Stream<Path> smaliFoldersStream = Files.list(decompiledDir).filter(Files::isDirectory)) {
+            smaliFoldersStream.forEach(smaliFolder -> {
+                Path smaliFolderPath = smaliFolder.resolve(packageDirectory);
+                if (Files.isDirectory(smaliFolderPath)) {
+                    try (Stream<Path> filesStream = Files.walk(smaliFolderPath)) {
+                        filesStream.filter(Files::isRegularFile).forEach(file -> {
+                            String fileName = file.getFileName().toString();
+                            // Exclude any class name containing a `$` sign
+                            if (fileName.endsWith(".smali") && !fileName.contains("$")) {
+                                classNames.add(fileName.replace(".smali", ""));  // Get the class name
+                            }
+                        });
+                    } catch (IOException e) {
+                    }
+                }
+            });
+        } catch (IOException e) {
+        }
+
+        return classNames;
+    }
+
+    public static Map<String, Set<String>> getMethodsForPackage(String packageName) {
+        Map<String, Set<String>> methodsMap = new HashMap<>();
+
+        Path decompiledDir = Paths.get(Main.decompiledApkPath);
+        String packageDirectory = packageName.replace('.', File.separatorChar);
+
+        Pattern methodPattern = Pattern.compile("\\.method .+ (\\w+)\\(");  // Pattern to find method names
+
+        try (Stream<Path> smaliFoldersStream = Files.list(decompiledDir).filter(Files::isDirectory)) {
+            smaliFoldersStream.forEach(smaliFolder -> {
+                Path smaliFolderPath = smaliFolder.resolve(packageDirectory);
+                if (Files.isDirectory(smaliFolderPath)) {
+                    try (Stream<Path> filesStream = Files.walk(smaliFolderPath)) {
+                        filesStream.filter(Files::isRegularFile).forEach(file -> {
+                            try {
+                                List<String> lines = Files.readAllLines(file);
+                                String fileName = file.getFileName().toString().replace(".smali", "");
+
+                                // Exclude methods from classes with `$` in the name
+                                if (!fileName.contains("$")) {
+                                    for (String line : lines) {
+                                        Matcher methodMatcher = methodPattern.matcher(line);
+                                        if (methodMatcher.find()) {
+                                            String methodName = methodMatcher.group(1);
+                                            // Exclude methods with a `$` in the method name
+                                            if (!methodName.contains("$")) {
+                                                methodsMap.computeIfAbsent(fileName, k -> new HashSet<>()).add(methodName);
+                                            }
+                                        }
+                                    }
+                                }
+                            } catch (IOException e) {
+                            }
+                        });
+                    } catch (IOException e) {
+                    }
+                }
+            });
+        } catch (IOException e) {
+        }
+
+        return methodsMap;
+    }
+
+    public static Map<String, Set<String>> getFieldsForPackage(String packageName) {
+        Map<String, Set<String>> fieldsMap = new HashMap<>();
+
+        Path decompiledDir = Paths.get(Main.decompiledApkPath);
+        String packageDirectory = packageName.replace('.', File.separatorChar);
+
+        Pattern fieldPattern = Pattern.compile("\\.field\\s+.+\\s+(\\w+)\\s*:\\s*");  // Pattern to find field names
+
+        try (Stream<Path> smaliFoldersStream = Files.list(decompiledDir).filter(Files::isDirectory)) {
+            smaliFoldersStream.forEach(smaliFolder -> {
+                Path smaliFolderPath = smaliFolder.resolve(packageDirectory);
+                if (Files.isDirectory(smaliFolderPath)) {
+                    try (Stream<Path> filesStream = Files.walk(smaliFolderPath)) {
+                        filesStream.filter(Files::isRegularFile).forEach(file -> {
+                            try {
+                                List<String> lines = Files.readAllLines(file);
+                                String fileName = file.getFileName().toString().replace(".smali", "");
+
+                                // Exclude fields from classes with `$` in the name
+                                if (!fileName.contains("$")) {
+                                    for (String line : lines) {
+                                        Matcher fieldMatcher = fieldPattern.matcher(line);
+                                        if (fieldMatcher.find()) {
+                                            String fieldName = fieldMatcher.group(1);
+                                            // Exclude fields with a `$` in the field name
+                                            if (!fieldName.contains("$")) {
+                                                fieldsMap.computeIfAbsent(fileName, k -> new HashSet<>()).add(fieldName);
+                                            }
+                                        }
+                                    }
+                                }
+                            } catch (IOException e) {
+                            }
+                        });
+                    } catch (IOException e) {
+                    }
+                }
+            });
+        } catch (IOException e) {
+        }
+
+        return fieldsMap;
+    }
 
     /**
      * @param args the command line arguments
@@ -1593,12 +1627,7 @@ public class Obfuscate extends javax.swing.JFrame {
     private javax.swing.JLabel availablePackagesLabel;
     private javax.swing.JTable availablePackagesTable;
     private javax.swing.JButton backButton;
-    private javax.swing.JPanel blackListCBPanel;
-    private javax.swing.JCheckBox blackListClassesCheckBox;
-    private javax.swing.JCheckBox blackListFieldVariables;
-    private javax.swing.JLabel blackListLabel;
-    private javax.swing.JCheckBox blackListLocalVariables;
-    private javax.swing.JCheckBox blackListMethodsCheckBox;
+    private javax.swing.JButton blackListButton;
     private javax.swing.JCheckBox classesCheckBox;
     private javax.swing.JTextArea consoleArea;
     private javax.swing.JScrollPane consoleScrollPane;
@@ -1644,4 +1673,6 @@ public class Obfuscate extends javax.swing.JFrame {
     private final Set<String> refactoredMethodNames = Collections.synchronizedSet(new HashSet<>());
     private final Set<String> refactoredClassNames = Collections.synchronizedSet(new HashSet<>());
     private final Set<String> refactoredFieldVariableNames = Collections.synchronizedSet(new HashSet<>());
+    public static Set<String> blacklistedItems = new HashSet<>();
+
 }

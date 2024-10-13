@@ -432,12 +432,12 @@ public class Main extends javax.swing.JFrame {
                         publicAPKFileName = apkFileName;
                         decompileFolderName = String.valueOf(outputDirectory.getFileName());
 
-                        loadingLabel.setVisible(false);
+                        //loadingLabel.setVisible(false);
                         consoleArea.append("Decompilation completed successfully.\n");
                         consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
                         // Show the success message
-                        JOptionPane.showMessageDialog(null, "Decompilation completed successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
-                        loadingLabel.setVisible(true);
+                        //JOptionPane.showMessageDialog(null, "Decompilation completed successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                        //loadingLabel.setVisible(true);
 
                         // Keep the loading label visible and update the console area
                         consoleArea.append("Analysing decompiled APK... Please wait!\n");
