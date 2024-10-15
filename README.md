@@ -24,9 +24,9 @@ The goal is to make reverse engineering more difficult by renaming sensitive par
 
 3. **Choose Obfuscation Options**:  
    - You can choose to obfuscate:
-     - **Classes🇨**
-     - **Methods🇲**
-     - **Field Variables🇫**
+     - **Classes**
+     - **Methods**
+     - **Field Variables**
    - There are additional options like adding a **prefix** to obfuscated names or including a **dynamic salt** to ensure randomness.
 
 4. **Blacklist Selection**:  
