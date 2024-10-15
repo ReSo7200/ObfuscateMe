@@ -83,16 +83,16 @@ While ObfuscateMe is simple and functional, a few areas require improvements:
 
 <table>
   <tr>
-    <td align="center"><img src="https://github.com/ReSo7200/ObfuscateMe/blob/building/screenshots/Main%20Class.png" width="400"/><br>Main Class</td>
-    <td align="center"><img src="https://github.com/ReSo7200/ObfuscateMe/blob/building/screenshots/Main%20Class%20-%20Decompiling.png" width="400"/><br>Main Class - Decompiling</td>
+    <td align="center"><img src="https://github.com/ReSo7200/ObfuscateMe/blob/main/screenshots/Main%20Class.png" width="400"/><br>Main Class</td>
+    <td align="center"><img src="https://github.com/ReSo7200/ObfuscateMe/blob/main/screenshots/Main%20Class%20-%20Decompiling.png" width="400"/><br>Main Class - Decompiling</td>
   </tr>
   <tr>
-    <td align="center"><img src="https://github.com/ReSo7200/ObfuscateMe/blob/building/screenshots/Package%20selection.png" width="400"/><br>Package Selection</td>
-    <td align="center"><img src="https://github.com/ReSo7200/ObfuscateMe/blob/building/screenshots/Blacklisting.png" width="400"/><br>Blacklisting</td>
+    <td align="center"><img src="https://github.com/ReSo7200/ObfuscateMe/blob/main/screenshots/Package%20selection.png" width="400"/><br>Package Selection</td>
+    <td align="center"><img src="https://github.com/ReSo7200/ObfuscateMe/blob/main/screenshots/Blacklisting.png" width="400"/><br>Blacklisting</td>
   </tr>
   <tr>
-    <td align="center"><img src="https://github.com/ReSo7200/ObfuscateMe/blob/building/screenshots/Recompile.png" width="400"/><br>Recompile Class</td>
-    <td align="center"><img src="https://github.com/ReSo7200/ObfuscateMe/blob/building/screenshots/Recompiling%20and%20signing.png" width="400"/><br>Recompiling and Signing</td>
+    <td align="center"><img src="https://github.com/ReSo7200/ObfuscateMe/blob/main/screenshots/Recompile.png" width="400"/><br>Recompile Class</td>
+    <td align="center"><img src="https://github.com/ReSo7200/ObfuscateMe/blob/main/screenshots/Recompiling%20and%20signing.png" width="400"/><br>Recompiling and Signing</td>
   </tr>
 </table>
 
