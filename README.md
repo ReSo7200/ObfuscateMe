@@ -3,8 +3,9 @@
   <img src="https://github.com/ReSo7200/ObfuscateMe/blob/2d11a5993c8e829d2a2baae19bd7552a498d7a29/logo/Logo%20Big.jpg" alt="ObfuscateMe Logo" width="400"/>
 </div>
 
+ObfuscateMe is a very simple APK obfuscator with a graphical user interface (GUI) that helps developers obscure their Android application code by refactoring class names, method names, and field variables. It was developed as part of my undergraduate project at the University of Bedfordshire.
 
-ObfuscateMe is a **very simple APK obfuscator** that helps developers obscure their Android application code by refactoring class names, method names, and field variables. It was developed as part of my undergraduate project at the University of Bedfordshire.
+The GUI allows users to easily select the APK, packages, classes, and methods to obfuscate, making the process more intuitive and user-friendly.
 
 The goal is to make reverse engineering more difficult by renaming sensitive parts of the APK code, making it harder for unauthorized parties to understand the logic behind the app. Although it's simple and easy to use, it also provides flexible options for obfuscation and blacklisting specific parts of the code from obfuscation.
 
@@ -14,9 +15,8 @@ The goal is to make reverse engineering more difficult by renaming sensitive par
 
 - **APK Decompilation** 🔍: Decompile APK files into readable smali code.
 - **Obfuscation** 🔏🌀: Refactor class names, method names, and field variables for enhanced security.
-- **Blacklisting⚫📋/Whitelisting⚪📋** : Select packages, classes, or methods that should not be obfuscated.
+- **Blacklisting⚫📋/Whitelisting⚪📋**: Select packages, classes, or methods that should not be obfuscated.
 - **Recompilation & Signing** 🔄🔐: Recompile the APK and sign it after obfuscation, ready for distribution.
-
 
 ---
 
@@ -46,6 +46,18 @@ The goal is to make reverse engineering more difficult by renaming sensitive par
 
 ---
 
+## Setup 🚀
+
+You can now download the **ObfuscateMe** setup from the [releases page](https://github.com/ReSo7200/ObfuscateMe/releases). The setup file allows for easy installation and execution of the tool. Here's how to get started:
+
+1. **Download the Latest Release**: Head to the [releases page](https://github.com/ReSo7200/ObfuscateMe/releases) and download the latest setup file.
+   
+2. **Run the Setup**: Follow the installation instructions to install the tool on your machine.
+
+3. **Launch ObfuscateMe**: Once installed, you can easily launch ObfuscateMe and start obfuscating your APKs.
+
+---
+
 ## Tools Used 🛠️
 
 Special thanks to the following tools used in this project:
@@ -67,9 +79,32 @@ While ObfuscateMe is simple and functional, a few areas require improvements:
 
 ---
 
+## Screenshots 📸
+
+<table>
+  <tr>
+    <td align="center"><img src="https://github.com/ReSo7200/ObfuscateMe/blob/building/screenshots/Main%20Class.png" width="400"/><br>Main Class</td>
+    <td align="center"><img src="https://github.com/ReSo7200/ObfuscateMe/blob/building/screenshots/Main%20Class%20-%20Decompiling.png" width="400"/><br>Main Class - Decompiling</td>
+  </tr>
+  <tr>
+    <td align="center"><img src="https://github.com/ReSo7200/ObfuscateMe/blob/building/screenshots/Package%20selection.png" width="400"/><br>Package Selection</td>
+    <td align="center"><img src="https://github.com/ReSo7200/ObfuscateMe/blob/building/screenshots/Blacklisting.png" width="400"/><br>Blacklisting</td>
+  </tr>
+  <tr>
+    <td align="center"><img src="https://github.com/ReSo7200/ObfuscateMe/blob/building/screenshots/Recompile.png" width="400"/><br>Recompile Class</td>
+    <td align="center"><img src="https://github.com/ReSo7200/ObfuscateMe/blob/building/screenshots/Recompiling%20and%20signing.png" width="400"/><br>Recompiling and Signing</td>
+  </tr>
+</table>
+
+
+
+---
+
 ## Contribution 🤝
 
 Feel free to fork the project, submit pull requests, or open issues if you encounter any bugs or have suggestions. I appreciate any contributions that help make ObfuscateMe better!
+
+**Note**: Please use **NetBeans IDE** for development, as the GUI was generated using the NetBeans GUI builder, and it ensures smooth editing and customization of the interface.
 
 ---
 
