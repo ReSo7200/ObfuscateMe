@@ -1,5 +1,8 @@
 # ObfuscateMe 🔒
-![ObfuscateMe Logo](https://github.com/ReSo7200/ObfuscateMe/blob/2d11a5993c8e829d2a2baae19bd7552a498d7a29/logo/Logo%20Big.jpg)
+<div align="center">
+  <img src="https://github.com/ReSo7200/ObfuscateMe/blob/2d11a5993c8e829d2a2baae19bd7552a498d7a29/logo/Logo%20Big.jpg" alt="ObfuscateMe Logo" width="400"/>
+</div>
+
 
 ObfuscateMe is a **very simple APK obfuscator** that helps developers obscure their Android application code by refactoring class names, method names, and field variables. It was developed as part of my undergraduate project at the University of Bedfordshire.
 
