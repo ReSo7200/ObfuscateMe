@@ -772,6 +772,7 @@ public class Obfuscate extends javax.swing.JFrame {
         consoleArea = new javax.swing.JTextArea();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("ObfuscateMe");
         setResizable(false);
 
         obfuscatePanel.setLayout(null);
@@ -1148,6 +1149,7 @@ public class Obfuscate extends javax.swing.JFrame {
 
         blackListButton.setText("Manage White/Black list");
         blackListButton.setEnabled(false);
+        blackListButton.setFocusable(false);
         blackListButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 blackListButtonActionPerformed(evt);

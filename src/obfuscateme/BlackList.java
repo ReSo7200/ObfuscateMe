@@ -20,7 +20,7 @@ import javax.swing.tree.DefaultTreeModel;
 
 /**
  *
- * @author abdal
+ * @author Abdalhaleem Altamimi - Student ID: 2113263
  */
 public final class BlackList extends javax.swing.JFrame {
 
@@ -36,6 +36,7 @@ public final class BlackList extends javax.swing.JFrame {
         private final Icon packageIcon;
 
         public CustomTreeCellRenderer() {
+
             int x = 16;
             int y = 16;
             int c_x = 17;
@@ -263,6 +264,9 @@ public final class BlackList extends javax.swing.JFrame {
      */
     public BlackList(List<String> packageNames) {
         initComponents();
+
+        this.setLocationRelativeTo(null);
+        setIconImage(Main.icon.getImage());
         this.packageNames = packageNames;
         // If you already have jTree1 in your NetBeans form, you don't need this line.
         populateTree();  // Populate the tree with packages, classes, methods, and fields
@@ -293,6 +297,7 @@ public final class BlackList extends javax.swing.JFrame {
         hint1Label = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("ObfuscateMe");
         setResizable(false);
 
         jPanel1.setLayout(null);

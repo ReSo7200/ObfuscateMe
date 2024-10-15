@@ -349,7 +349,7 @@ public class Main extends javax.swing.JFrame {
         consoleArea.append("Decompiling APK file: " + selectedApkPath + "\n");
         consoleArea.append("Output directory: " + outputDirectory + "\n");
 
-        String apkToolPath = new File("src/obfuscateme/apktool.jar").getAbsolutePath();
+        String apkToolPath = new File("lib/apktool.jar").getAbsolutePath();
         ProcessBuilder processBuilder = new ProcessBuilder(
                 "java", "-jar", apkToolPath, "d", selectedApkPath.toAbsolutePath().toString(), "-o", outputDirectory.toAbsolutePath().toString(), "-f"
         );
