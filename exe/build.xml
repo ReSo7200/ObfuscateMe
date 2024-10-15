@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch4jConfig>
+  <dontWrapJar>false</dontWrapJar>
+  <headerType>gui</headerType>
+  <jar>E:\ObfuscateMe\dist\ObfuscateMe.jar</jar>
+  <outfile>E:\ObfuscateMe\exe\ObfuscateMe.exe</outfile>
+  <errTitle>Java not found!</errTitle>
+  <cmdLine></cmdLine>
+  <chdir>.</chdir>
+  <priority>normal</priority>
+  <downloadUrl>https://www.oracle.com/java/technologies/javase/javase8-archive-downloads.html</downloadUrl>
+  <supportUrl></supportUrl>
+  <stayAlive>false</stayAlive>
+  <restartOnCrash>false</restartOnCrash>
+  <manifest></manifest>
+  <icon>E:\ObfuscateMe\src\obfuscateme\img\icon.ico</icon>
+  <jre>
+    <path>%JAVA_HOME%;%PATH%</path>
+    <requiresJdk>false</requiresJdk>
+    <requires64Bit>false</requires64Bit>
+    <minVersion>8</minVersion>
+    <maxVersion></maxVersion>
+  </jre>
+</launch4jConfig>
