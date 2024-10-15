@@ -600,6 +600,7 @@
         <Component class="javax.swing.JButton" name="blackListButton">
           <Properties>
             <Property name="text" type="java.lang.String" value="Manage White/Black list"/>
+            <Property name="enabled" type="boolean" value="false"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="blackListButtonActionPerformed"/>

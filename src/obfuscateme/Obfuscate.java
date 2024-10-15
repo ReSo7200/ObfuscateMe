@@ -299,7 +299,6 @@ public class Obfuscate extends javax.swing.JFrame {
                                 String filePackagePath = getPackagePath(decompiledDir, file);
 
                                 if (selectedPackageName.equals(filePackagePath)) {
-                                    System.out.println(loadBlacklistedItems());
                                     processFileForObfuscation(content, fileName, filePackagePath);
                                 }
                                 // Collect external method usages across all files
@@ -368,10 +367,8 @@ public class Obfuscate extends javax.swing.JFrame {
         String fullClassName = packageName + "." + className;
 
         if (classesCheckBox.isSelected()) {
-//            // Check if the class itself is blacklisted
-//            System.out.println("Checking Class: " + fullClassName);
-//            System.out.println("Blacklist contains: " + loadBlacklistedItems().contains(fullClassName));
-            if (!((loadBlacklistedItems().contains(fullClassName)) || (excludedClasses.contains(className)))){
+            // Check if the class itself is blacklisted
+            if (!((loadBlacklistedItems().contains(fullClassName)) || (excludedClasses.contains(className)))) {
                 if (addSaltCheckBox.isSelected()) {
                     if (addPrefixCheckBox.isSelected()) {
                         classRenameMap.putIfAbsent(className, "Class" + generateDynamicSalt() + generateValidUUID());
@@ -393,7 +390,6 @@ public class Obfuscate extends javax.swing.JFrame {
             while (methodMatcher.find()) {
                 String methodName = methodMatcher.group(1);
                 String fullMethodName = fullClassName + "." + methodName;
-                System.out.println(fullMethodName);
 
                 // Check if the method is blacklisted within this specific class and package
                 if (!((loadBlacklistedItems().contains(fullMethodName)) || (excludedMethods.contains(methodName)))) {
@@ -1151,6 +1147,7 @@ public class Obfuscate extends javax.swing.JFrame {
         backButton.setBounds(1110, 610, 150, 60);
 
         blackListButton.setText("Manage White/Black list");
+        blackListButton.setEnabled(false);
         blackListButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 blackListButtonActionPerformed(evt);
@@ -1464,7 +1461,7 @@ public class Obfuscate extends javax.swing.JFrame {
         List<String> selectedPackages = getSelectedPackagesFromTable();  // A method to get selected packages
         if (!selectedPackages.isEmpty()) {
             // Pass the selected packages to the JTree view
-            test treeView = new test(selectedPackages);  // Modify 'test' to accept multiple packages
+            BlackList treeView = new BlackList(selectedPackages);  // Modify 'BlackList' to accept multiple packages
             treeView.setVisible(true);  // Show the JTree window
         } else {
             JOptionPane.showMessageDialog(this, "Please select at least one package to view.");

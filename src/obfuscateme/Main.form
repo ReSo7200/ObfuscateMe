@@ -202,13 +202,13 @@
         <Component class="javax.swing.JLabel" name="infoLabel">
           <Properties>
             <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-              <Font name="Segoe UI" size="14" style="2"/>
+              <Font name="Segoe UI" size="12" style="2"/>
             </Property>
             <Property name="text" type="java.lang.String" value="Developed by Abdalhaleem Altamimi - @ReSo7200"/>
           </Properties>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-              <AbsoluteConstraints x="550" y="440" width="340" height="20"/>
+              <AbsoluteConstraints x="560" y="440" width="290" height="20"/>
             </Constraint>
           </Constraints>
         </Component>

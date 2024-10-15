@@ -155,10 +155,10 @@ public class Main extends javax.swing.JFrame {
         mainPanel.add(descriptionLabel);
         descriptionLabel.setBounds(360, 200, 150, 20);
 
-        infoLabel.setFont(new java.awt.Font("Segoe UI", 2, 14)); // NOI18N
+        infoLabel.setFont(new java.awt.Font("Segoe UI", 2, 12)); // NOI18N
         infoLabel.setText("Developed by Abdalhaleem Altamimi - @ReSo7200");
         mainPanel.add(infoLabel);
-        infoLabel.setBounds(550, 440, 340, 20);
+        infoLabel.setBounds(560, 440, 290, 20);
 
         info2Label.setFont(new java.awt.Font("Segoe UI", 2, 12)); // NOI18N
         info2Label.setText("University of Bedfordshire Undergradute Project - Student ID: 2113263");
@@ -334,46 +334,6 @@ public class Main extends javax.swing.JFrame {
         return directoryToBeDeleted.delete();
     }
 
-    // Background task to delete directory
-    private void deleteDirectoryInBackground(File outputDirFile, String apkFileName) {
-        enableLoading();
-        consoleArea.append("Trying to delete directory:" + outputDirectory + " \n");
-        consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
-
-        // Create a SwingWorker to handle the directory deletion in the background
-        SwingWorker<Boolean, Void> worker = new SwingWorker<>() {
-            @Override
-            protected Boolean doInBackground() {
-                // Perform the directory deletion
-                return deleteDirectory(outputDirFile);
-            }
-
-            @Override
-            protected void done() {
-                try {
-                    boolean deleted = get();
-                    if (!deleted) {
-                        JOptionPane.showMessageDialog(null, "Failed to delete existing directory.", "Error", JOptionPane.ERROR_MESSAGE);
-                        consoleArea.append("Couldn't delete directory:" + outputDirectory + " \n");
-                        consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
-                        outputDirectory = findUniqueDirectory(outputDirectory);
-                        consoleArea.append("Will be using directory:" + outputDirectory + " \n");
-                    } else {
-                        consoleArea.append("Deleted directory:" + outputDirectory + " \n");
-                    }
-                    consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
-                } catch (HeadlessException | InterruptedException | ExecutionException e) {
-                    consoleArea.append("Error during directory deletion: " + e.getMessage() + "\n");
-                    consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
-                } finally {
-                    executeApktool(apkFileName); // Proceed to execute APK tool after directory deletion
-                }
-            }
-        };
-
-        worker.execute(); // Execute the background task
-    }
-
     private Path findUniqueDirectory(Path baseOutputDirectory) {
         int counter = 1;
         Path uniqueDir = baseOutputDirectory;
@@ -435,9 +395,6 @@ public class Main extends javax.swing.JFrame {
                         //loadingLabel.setVisible(false);
                         consoleArea.append("Decompilation completed successfully.\n");
                         consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
-                        // Show the success message
-                        //JOptionPane.showMessageDialog(null, "Decompilation completed successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
-                        //loadingLabel.setVisible(true);
 
                         // Keep the loading label visible and update the console area
                         consoleArea.append("Analysing decompiled APK... Please wait!\n");
@@ -481,6 +438,46 @@ public class Main extends javax.swing.JFrame {
 
         // Start the SwingWorker
         worker.execute();
+    }
+
+    // Background task to delete directory
+    private void deleteDirectoryInBackground(File outputDirFile, String apkFileName) {
+        enableLoading();
+        consoleArea.append("Trying to delete directory:" + outputDirectory + " \n");
+        consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
+
+        // Create a SwingWorker to handle the directory deletion in the background
+        SwingWorker<Boolean, Void> worker = new SwingWorker<>() {
+            @Override
+            protected Boolean doInBackground() {
+                // Perform the directory deletion
+                return deleteDirectory(outputDirFile);
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    boolean deleted = get();
+                    if (!deleted) {
+                        JOptionPane.showMessageDialog(null, "Failed to delete existing directory.", "Error", JOptionPane.ERROR_MESSAGE);
+                        consoleArea.append("Couldn't delete directory:" + outputDirectory + " \n");
+                        consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
+                        outputDirectory = findUniqueDirectory(outputDirectory);
+                        consoleArea.append("Will be using directory:" + outputDirectory + " \n");
+                    } else {
+                        consoleArea.append("Deleted directory:" + outputDirectory + " \n");
+                    }
+                    consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
+                } catch (HeadlessException | InterruptedException | ExecutionException e) {
+                    consoleArea.append("Error during directory deletion: " + e.getMessage() + "\n");
+                    consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
+                } finally {
+                    executeApktool(apkFileName); // Proceed to execute APK tool after directory deletion
+                }
+            }
+        };
+
+        worker.execute(); // Execute the background task
     }
 
     public static void openWebpage(String urlString) {
